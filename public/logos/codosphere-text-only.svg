@@ -1,0 +1,28 @@
+<svg width="500" height="100" viewBox="0 0 500 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f45b69" />
+      <stop offset="1" stop-color="#00d4ff" />
+    </linearGradient>
+    
+    <filter id="textGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <text 
+    x="20" 
+    y="65" 
+    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" 
+    font-size="48" 
+    font-weight="bold" 
+    fill="url(#textGradient)"
+    filter="url(#textGlow)"
+  >
+    CodoSphere
+  </text>
+</svg>
