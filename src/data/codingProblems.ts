@@ -2540,8 +2540,32 @@ public:
   }
 };
 
-// Function to get initial code snippet based on the problem and language
-export const getInitialCodeSnippet = (language: string, problemId: number): string => {
+// Re-export types from the generic wrapper generator for convenience
+export type { FunctionMeta, ParamDef } from '../services/api/wrapperGenerator';
+import { generateStarterCode } from '../services/api/wrapperGenerator';
+
+/**
+ * Get initial code snippet based on the problem and language.
+ *
+ * Resolution order:
+ *   1. Problem's embedded `starterCode` (Firebase / self-describing problems)
+ *   2. Auto-generated from `functionMeta` (new problems with signature metadata)
+ *   3. Built-in template map (static problems 1-30)
+ *   4. Default generic template
+ */
+export const getInitialCodeSnippet = (language: string, problemId: number, problem?: any): string => {
+  // 1. Problem has explicit starter code for this language
+  if (problem?.starterCode?.[language]) {
+    return problem.starterCode[language];
+  }
+
+  // 2. Auto-generate from function metadata
+  if (problem?.functionMeta) {
+    const generated = generateStarterCode(language, problem.functionMeta);
+    if (generated) return generated;
+  }
+
+  // 3. Fall through to built-in template map (existing problems 1-30)
   // Map problem ID to template key
   const templateMap: { [key: number]: string } = {
     1: 'twoSum',

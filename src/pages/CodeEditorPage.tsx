@@ -205,7 +205,7 @@ const CodeEditorPage = () => {
 
   // Update code when language changes
   useEffect(() => {
-    if (problemId) setCode(getInitialCodeSnippet(language, problemId));
+    if (problemId) setCode(getInitialCodeSnippet(language, problemId, problem ?? undefined));
   }, [language, problemId]);
 
   // Timer
@@ -415,7 +415,7 @@ const CodeEditorPage = () => {
         return;
       }
 
-      const wrappedCode = wrapCode(code, language, problemId);
+      const wrappedCode = wrapCode(code, language, problemId, problem?.functionMeta);
       const results = await evaluateCode(wrappedCode, language, testCases);
       setSubmissionResults(results);
 
@@ -516,7 +516,7 @@ const CodeEditorPage = () => {
 
   const handleResetCode = () => {
     if (window.confirm('Are you sure you want to reset your code to the initial template?')) {
-      setCode(getInitialCodeSnippet(language, problemId));
+      setCode(getInitialCodeSnippet(language, problemId, problem ?? undefined));
     }
   };
 

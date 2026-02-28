@@ -2283,16 +2283,34 @@ const wrapperRegistry: Record<number, ProblemWrappers> = {
   30: nQueensWrappers,
 };
 
+import { generateWrapper, FunctionMeta } from './wrapperGenerator';
+
 /**
  * Wraps user code with I/O handling for Judge0 submission.
- * If no wrapper exists for the given problem/language combo, returns code as-is.
+ *
+ * Resolution order:
+ *   1. Hand-written wrapper from the registry (problems 1-30)
+ *   2. Auto-generated wrapper from `functionMeta` (Firebase / new problems)
+ *   3. Return code as-is
  */
-export const wrapCode = (code: string, language: string, problemId: number): string => {
+export const wrapCode = (
+  code: string,
+  language: string,
+  problemId: number,
+  functionMeta?: FunctionMeta,
+): string => {
+  // 1. Try the hand-written registry (existing problems 1-30)
   const problemWrappers = wrapperRegistry[problemId];
-  if (!problemWrappers) return code;
+  if (problemWrappers) {
+    const wrapper = problemWrappers[language];
+    if (wrapper) return wrapper(code);
+  }
 
-  const wrapper = problemWrappers[language];
-  if (!wrapper) return code;
+  // 2. Try generic wrapper from function metadata
+  if (functionMeta) {
+    return generateWrapper(code, language, functionMeta);
+  }
 
-  return wrapper(code);
+  // 3. Fallback — return code as-is
+  return code;
 };

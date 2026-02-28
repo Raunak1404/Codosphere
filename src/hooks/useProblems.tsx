@@ -33,6 +33,8 @@ export const useProblems = () => {
           constraints: problem.constraints || [],
           tags: problem.tags || [],
           testCases: problem.testCases || [],
+          functionMeta: problem.functionMeta || undefined,
+          starterCode: problem.starterCode || undefined,
           solved: false, // This will be determined by user data
           firebaseId: problem.id // Keep reference to Firebase document ID
         }));
@@ -128,6 +130,8 @@ export const getDynamicProblemById = (id: string | number): Promise<any> => {
           constraints: problem.constraints || [],
           tags: problem.tags || [],
           testCases: problem.testCases || [],
+          functionMeta: problem.functionMeta || undefined,
+          starterCode: problem.starterCode || undefined,
           solved: false,
           firebaseId: problem.id
         };

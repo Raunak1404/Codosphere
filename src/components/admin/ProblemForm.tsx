@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, Save, FileText } from 'lucide-react';
+import { X, Upload, Save, FileText, Code, ChevronDown, ChevronRight } from 'lucide-react';
+
+const PARAM_TYPES = ['int', 'float', 'string', 'boolean', 'int[]', 'float[]', 'string[]', 'int[][]'] as const;
+const RETURN_TYPES = ['int', 'float', 'string', 'boolean', 'int[]', 'float[]', 'string[]', 'int[][]', 'void'] as const;
+const LANGUAGES = ['javascript', 'python', 'java', 'c', 'cpp'] as const;
 
 interface AdminProblem {
   id?: string;
@@ -11,6 +15,13 @@ interface AdminProblem {
   constraints: string[];
   tags: string[];
   testCases: { input: string; expectedOutput: string; isHidden: boolean }[];
+  functionMeta?: {
+    name: string;
+    params: { name: string; type: string }[];
+    returnType: string;
+    className?: string;
+  };
+  starterCode?: { [language: string]: string };
   contentFileUrl?: string;
   createdAt?: any;
   updatedAt?: any;
@@ -60,6 +71,43 @@ const ProblemForm: React.FC<ProblemFormProps> = ({
     onFormDataChange({ ...formData, testCases: [...(formData.testCases || []), { input: '', expectedOutput: '', isHidden: false }] });
   const removeTestCase = (i: number) =>
     onFormDataChange({ ...formData, testCases: (formData.testCases || []).filter((_, idx) => idx !== i) });
+
+  // --- Function Signature helpers ---
+  const [showFunctionMeta, setShowFunctionMeta] = useState(!!formData.functionMeta);
+  const [showStarterCode, setShowStarterCode] = useState(!!formData.starterCode);
+
+  const initFunctionMeta = () => {
+    if (!formData.functionMeta) {
+      onFormDataChange({
+        ...formData,
+        functionMeta: { name: '', params: [{ name: '', type: 'int' }], returnType: 'int' },
+      });
+    }
+    setShowFunctionMeta(true);
+  };
+
+  const updateFunctionMeta = (patch: Partial<NonNullable<AdminProblem['functionMeta']>>) => {
+    onFormDataChange({
+      ...formData,
+      functionMeta: { ...formData.functionMeta!, ...patch },
+    });
+  };
+
+  const addParam = () => {
+    const params = [...(formData.functionMeta?.params || []), { name: '', type: 'int' }];
+    updateFunctionMeta({ params });
+  };
+  const removeParam = (i: number) => {
+    const params = (formData.functionMeta?.params || []).filter((_, idx) => idx !== i);
+    updateFunctionMeta({ params });
+  };
+
+  const updateStarterCode = (lang: string, code: string) => {
+    onFormDataChange({
+      ...formData,
+      starterCode: { ...(formData.starterCode || {}), [lang]: code },
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -356,6 +404,162 @@ const ProblemForm: React.FC<ProblemFormProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* ── Function Signature (collapsible) ── */}
+              <div className="border border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => { if (!showFunctionMeta) initFunctionMeta(); else setShowFunctionMeta(false); }}
+                  className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-white/[0.03] transition-colors"
+                >
+                  {showFunctionMeta ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  <Code size={16} className="text-[var(--accent)]" />
+                  Function Signature
+                  <span className="text-xs text-[var(--text-secondary)] ml-auto">Enables auto-generated wrappers &amp; starter code</span>
+                </button>
+
+                {showFunctionMeta && formData.functionMeta && (
+                  <div className="p-4 border-t border-gray-700 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Function Name *</label>
+                        <input
+                          type="text"
+                          value={formData.functionMeta.name}
+                          onChange={(e) => updateFunctionMeta({ name: e.target.value })}
+                          className="w-full px-3 py-2 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)] text-sm font-mono"
+                          placeholder="e.g. twoSum"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Return Type *</label>
+                        <select
+                          value={formData.functionMeta.returnType}
+                          onChange={(e) => updateFunctionMeta({ returnType: e.target.value })}
+                          className="w-full px-3 py-2 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)] text-sm"
+                        >
+                          {RETURN_TYPES.map((t) => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1">Class Name</label>
+                        <input
+                          type="text"
+                          value={formData.functionMeta.className || ''}
+                          onChange={(e) => updateFunctionMeta({ className: e.target.value || undefined })}
+                          className="w-full px-3 py-2 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)] text-sm font-mono"
+                          placeholder="Solution (default)"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Parameters */}
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <label className="text-xs text-[var(--text-secondary)]">Parameters</label>
+                        <button type="button" onClick={addParam} className="text-[var(--accent)] hover:text-[var(--accent-hover)] text-xs">
+                          + Add Parameter
+                        </button>
+                      </div>
+                      {formData.functionMeta.params.map((param, idx) => (
+                        <div key={idx} className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={param.name}
+                            onChange={(e) => {
+                              const params = [...formData.functionMeta!.params];
+                              params[idx] = { ...param, name: e.target.value };
+                              updateFunctionMeta({ params });
+                            }}
+                            className="flex-1 px-3 py-1.5 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)] text-sm font-mono"
+                            placeholder="param name"
+                          />
+                          <select
+                            value={param.type}
+                            onChange={(e) => {
+                              const params = [...formData.functionMeta!.params];
+                              params[idx] = { ...param, type: e.target.value };
+                              updateFunctionMeta({ params });
+                            }}
+                            className="px-3 py-1.5 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)] text-sm"
+                          >
+                            {PARAM_TYPES.map((t) => (
+                              <option key={t} value={t}>{t}</option>
+                            ))}
+                          </select>
+                          {formData.functionMeta!.params.length > 1 && (
+                            <button type="button" onClick={() => removeParam(idx)} className="p-1.5 text-red-400 hover:text-red-300">
+                              <X size={14} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-xs text-[var(--text-secondary)] bg-[var(--primary)] p-3 rounded-lg border border-gray-700">
+                      The platform will auto-generate I/O wrappers and starter code for JavaScript, Python, Java, C, and C++ from this signature. You can override any language below.
+                    </p>
+
+                    {/* Clear function meta */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onFormDataChange({ ...formData, functionMeta: undefined });
+                        setShowFunctionMeta(false);
+                      }}
+                      className="text-xs text-red-400 hover:text-red-300"
+                    >
+                      Remove function signature
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Custom Starter Code (collapsible) ── */}
+              <div className="border border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setShowStarterCode(!showStarterCode)}
+                  className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-white/[0.03] transition-colors"
+                >
+                  {showStarterCode ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  <FileText size={16} className="text-[var(--accent-secondary)]" />
+                  Custom Starter Code
+                  <span className="text-xs text-[var(--text-secondary)] ml-auto">Override auto-generated templates</span>
+                </button>
+
+                {showStarterCode && (
+                  <div className="p-4 border-t border-gray-700 space-y-3">
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Leave blank to auto-generate from function signature. Only fill in languages you want to customize.
+                    </p>
+                    {LANGUAGES.map((lang) => (
+                      <div key={lang}>
+                        <label className="block text-xs text-[var(--text-secondary)] mb-1 capitalize">{lang === 'cpp' ? 'C++' : lang}</label>
+                        <textarea
+                          rows={4}
+                          value={formData.starterCode?.[lang] || ''}
+                          onChange={(e) => updateStarterCode(lang, e.target.value)}
+                          className="w-full px-3 py-2 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)] text-xs font-mono"
+                          placeholder={`Starter code for ${lang === 'cpp' ? 'C++' : lang} (optional)`}
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onFormDataChange({ ...formData, starterCode: undefined });
+                        setShowStarterCode(false);
+                      }}
+                      className="text-xs text-red-400 hover:text-red-300"
+                    >
+                      Clear all starter code
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Submit Buttons */}

@@ -16,6 +16,7 @@ import { checkAdminAuth } from './admin';
 
 export interface AdminProblem {
   id?: string;
+  numericId?: number;
   title: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   description: string;
@@ -31,6 +32,15 @@ export interface AdminProblem {
     expectedOutput: string;
     isHidden: boolean;
   }>;
+  /** Function signature metadata — enables auto-generated I/O wrappers */
+  functionMeta?: {
+    name: string;
+    params: { name: string; type: string }[];
+    returnType: string;
+    className?: string;
+  };
+  /** Per-language starter code templates (overrides auto-generated) */
+  starterCode?: { [language: string]: string };
   contentFileUrl?: string;
   createdAt?: any;
   updatedAt?: any;

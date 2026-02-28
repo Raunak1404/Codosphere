@@ -5,6 +5,7 @@ export { updateProblemSolved, updateMatchResults, updateUserRanks } from './user
 export { getLeaderboard, getUserRankPosition, getProblemSolvers } from './leaderboard';
 export { isAdmin, checkAdminAuth } from './admin';
 export type { AdminProblem } from './problems';
+export type { FunctionMeta, ParamDef } from '../api/wrapperGenerator';
 export {
   createProblem,
   updateProblem,
