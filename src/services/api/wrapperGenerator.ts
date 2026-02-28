@@ -145,13 +145,13 @@ function jsRead(type: string, expr: string): string {
     case 'boolean':
       return `(${expr} === 'true')`;
     case 'int[]':
-      return `${expr}.split(',').map(Number)`;
+      return `${expr}.replace(/[\\[\\]\\s]/g,'').split(',').map(Number)`;
     case 'float[]':
-      return `${expr}.split(',').map(Number)`;
+      return `${expr}.replace(/[\\[\\]\\s]/g,'').split(',').map(Number)`;
     case 'string[]':
-      return `${expr}.split(',')`;
+      return `${expr}.replace(/[\\[\\]]/g,'').split(',')`;
     case 'int[][]':
-      return `${expr}.split(';').map(r => r.split(',').map(Number))`;
+      return `${expr}.replace(/[\\[\\]]/g,'').split(';').map(r => r.split(',').map(Number))`;
     default:
       return expr;
   }
@@ -244,6 +244,8 @@ function genPython(userCode: string, meta: FunctionMeta): string {
 }
 
 function pyRead(type: string, expr: string): string {
+  // Strip brackets/spaces so both "[1, 2, 3]" and "1,2,3" work
+  const stripped = `${expr}.replace('[','').replace(']','').strip()`;
   switch (type) {
     case 'int':
       return `int(${expr})`;
@@ -254,13 +256,13 @@ function pyRead(type: string, expr: string): string {
     case 'boolean':
       return `(${expr} == 'true')`;
     case 'int[]':
-      return `list(map(int, ${expr}.split(',')))`;
+      return `list(map(int, ${stripped}.split(',')))`;
     case 'float[]':
-      return `list(map(float, ${expr}.split(',')))`;
+      return `list(map(float, ${stripped}.split(',')))`;
     case 'string[]':
-      return `${expr}.split(',')`;
+      return `${stripped}.split(',')`;
     case 'int[][]':
-      return `[list(map(int, r.split(','))) for r in ${expr}.split(';')]`;
+      return `[list(map(int, r.split(','))) for r in ${stripped}.split(';')]`;
     default:
       return expr;
   }
@@ -403,7 +405,10 @@ function javaRead(p: ParamDef): string[] {
       break;
     case 'int[]':
       lines.push(
-        `String[] __${p.name}Parts = br.readLine().trim().split(",");`,
+        `String __${p.name}Raw = br.readLine().trim().replaceAll("[\\\\[\\\\]\\\\s]", "");`,
+      );
+      lines.push(
+        `String[] __${p.name}Parts = __${p.name}Raw.split(",");`,
       );
       lines.push(`int[] ${p.name} = new int[__${p.name}Parts.length];`);
       lines.push(
@@ -412,7 +417,10 @@ function javaRead(p: ParamDef): string[] {
       break;
     case 'float[]':
       lines.push(
-        `String[] __${p.name}Parts = br.readLine().trim().split(",");`,
+        `String __${p.name}Raw = br.readLine().trim().replaceAll("[\\\\[\\\\]\\\\s]", "");`,
+      );
+      lines.push(
+        `String[] __${p.name}Parts = __${p.name}Raw.split(",");`,
       );
       lines.push(`double[] ${p.name} = new double[__${p.name}Parts.length];`);
       lines.push(
@@ -420,11 +428,11 @@ function javaRead(p: ParamDef): string[] {
       );
       break;
     case 'string[]':
-      lines.push(`String[] ${p.name} = br.readLine().trim().split(",");`);
+      lines.push(`String[] ${p.name} = br.readLine().trim().replaceAll("[\\\\[\\\\]]", "").split(",");`);
       break;
     case 'int[][]':
       lines.push(
-        `String[] __${p.name}Rows = br.readLine().trim().split(";");`,
+        `String[] __${p.name}Rows = br.readLine().trim().replaceAll("[\\\\[\\\\]]", "").split(";");`,
       );
       lines.push(
         `int[][] ${p.name} = new int[__${p.name}Rows.length][];`,
@@ -620,6 +628,8 @@ function cRead(p: ParamDef, callArgs: string[]): string[] {
         `fgets(__${p.name}Line, sizeof(__${p.name}Line), stdin);`,
       );
       lines.push(`__${p.name}Line[strcspn(__${p.name}Line, "\\n")] = 0;`);
+      // Strip brackets: remove [ ] characters
+      lines.push(`{ char *__s = __${p.name}Line, *__d = __${p.name}Line; while (*__s) { if (*__s != '[' && *__s != ']' && *__s != ' ') *__d++ = *__s; __s++; } *__d = 0; }`);
       lines.push(`int ${p.name}[100000], ${p.name}Size = 0;`);
       lines.push(
         `char *__${p.name}Tok = strtok(__${p.name}Line, ",");`,
@@ -851,28 +861,32 @@ function cppRead(p: ParamDef): string[] {
     case 'int[]':
       lines.push(`string __${p.name}Line;`);
       lines.push(`getline(cin, __${p.name}Line);`);
+      lines.push(`__${p.name}Line.erase(remove_if(__${p.name}Line.begin(), __${p.name}Line.end(), [](char c){ return c=='[' || c==']' || c==' '; }), __${p.name}Line.end());`);
       lines.push(`vector<int> ${p.name};`);
       lines.push(`{ stringstream __ss(__${p.name}Line); string __tok;`);
       lines.push(
-        `  while (getline(__ss, __tok, \',\')) ${p.name}.push_back(stoi(__tok)); }`,
+        `  while (getline(__ss, __tok, ',')) ${p.name}.push_back(stoi(__tok)); }`,
       );
       break;
     case 'float[]':
       lines.push(`string __${p.name}Line;`);
       lines.push(`getline(cin, __${p.name}Line);`);
+      lines.push(`__${p.name}Line.erase(remove_if(__${p.name}Line.begin(), __${p.name}Line.end(), [](char c){ return c=='[' || c==']' || c==' '; }), __${p.name}Line.end());`);
       lines.push(`vector<double> ${p.name};`);
       lines.push(`{ stringstream __ss(__${p.name}Line); string __tok;`);
       lines.push(
-        `  while (getline(__ss, __tok, \',\')) ${p.name}.push_back(stod(__tok)); }`,
+        `  while (getline(__ss, __tok, ',')) ${p.name}.push_back(stod(__tok)); }`,
       );
       break;
     case 'string[]':
       lines.push(`string __${p.name}Line;`);
       lines.push(`getline(cin, __${p.name}Line);`);
+      lines.push(`__${p.name}Line.erase(remove(__${p.name}Line.begin(), __${p.name}Line.end(), '['), __${p.name}Line.end());`);
+      lines.push(`__${p.name}Line.erase(remove(__${p.name}Line.begin(), __${p.name}Line.end(), ']'), __${p.name}Line.end());`);
       lines.push(`vector<string> ${p.name};`);
       lines.push(`{ stringstream __ss(__${p.name}Line); string __tok;`);
       lines.push(
-        `  while (getline(__ss, __tok, \',\')) ${p.name}.push_back(__tok); }`,
+        `  while (getline(__ss, __tok, ',')) ${p.name}.push_back(__tok); }`,
       );
       break;
     case 'int[][]':

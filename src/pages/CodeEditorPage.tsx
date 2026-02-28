@@ -22,7 +22,7 @@ const CodeEditorPage = () => {
   const location = useLocation();
   const { matchId, isRankedMatch, opponent, matchStartTime: routeMatchStartTime } = location.state || {};
 
-  const { getProblemById } = useProblems();
+  const { getProblemById, loading: problemsLoading } = useProblems();
   const problemId = id ? parseInt(id, 10) : 0;
   const [problem, setProblem] = useState<any>(null);
   const [language, setLanguage] = useState('javascript');
@@ -108,8 +108,7 @@ const CodeEditorPage = () => {
         setProblem(foundProblem);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, problemId]);
+  }, [id, problemId, getProblemById]);
 
   // Load opponent profile
   useEffect(() => {
@@ -203,10 +202,10 @@ const CodeEditorPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRankedMatch, matchId, currentUser?.uid]);
 
-  // Update code when language changes
+  // Update code when language changes or problem loads (e.g. from Firebase)
   useEffect(() => {
     if (problemId) setCode(getInitialCodeSnippet(language, problemId, problem ?? undefined));
-  }, [language, problemId]);
+  }, [language, problemId, problem]);
 
   // Timer
   useEffect(() => {
@@ -521,6 +520,34 @@ const CodeEditorPage = () => {
   };
 
   // ---------- Render ----------
+
+  // Still loading problems from Firebase — show spinner instead of "not found"
+  if (!problem && problemsLoading) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen flex items-center justify-center bg-[var(--primary)]">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="w-14 h-14 mx-auto mb-4 rounded-full border-2 border-transparent"
+              style={{
+                backgroundImage: 'linear-gradient(var(--primary), var(--primary)), linear-gradient(135deg, var(--accent), var(--accent-secondary))',
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'content-box, border-box',
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+            />
+            <p className="text-sm text-[var(--text-secondary)]">Loading problem...</p>
+          </motion.div>
+        </div>
+      </PageTransition>
+    );
+  }
 
   // Problem not found
   if (!problem) {
