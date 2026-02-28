@@ -1,0 +1,327 @@
+/* ===== Liquid Glassy Button Styles with shimmer hover ===== */
+
+/* Shimmer pseudo-element mixin — applied to all btn variants */
+.btn-primary::before,
+.btn-hero::before,
+.btn-secondary::before,
+.btn-hero-secondary::before,
+.btn-accent::before,
+.btn-success::before,
+.btn-danger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  transition: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-primary:hover::before,
+.btn-hero:hover::before,
+.btn-secondary:hover::before,
+.btn-hero-secondary:hover::before,
+.btn-accent:hover::before,
+.btn-success:hover::before,
+.btn-danger:hover::before {
+  animation: shimmer-sweep 0.8s ease-out;
+}
+
+.btn-primary {
+  @apply px-6 py-2 rounded-2xl text-white font-medium transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(244, 91, 105, 0.6) 0%,
+    rgba(244, 91, 105, 0.4) 50%,
+    rgba(244, 91, 105, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(244, 91, 105, 0.2);
+  box-shadow:
+    0 8px 32px rgba(244, 91, 105, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg,
+    rgba(245, 114, 125, 0.7) 0%,
+    rgba(245, 114, 125, 0.5) 50%,
+    rgba(245, 114, 125, 0.7) 100%);
+  box-shadow:
+    0 12px 40px rgba(244, 91, 105, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(245, 114, 125, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 4px 16px rgba(244, 91, 105, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Large hero buttons for homepage */
+.btn-hero {
+  @apply px-12 py-5 text-xl font-semibold rounded-3xl transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(244, 91, 105, 0.6) 0%,
+    rgba(244, 91, 105, 0.4) 50%,
+    rgba(244, 91, 105, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(244, 91, 105, 0.2);
+  box-shadow:
+    0 12px 40px rgba(244, 91, 105, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-hero:hover {
+  transform: translateY(-3px) scale(1.03);
+  background: linear-gradient(135deg,
+    rgba(245, 114, 125, 0.75) 0%,
+    rgba(245, 114, 125, 0.55) 50%,
+    rgba(245, 114, 125, 0.75) 100%);
+  box-shadow:
+    0 16px 50px rgba(244, 91, 105, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(245, 114, 125, 0.4);
+}
+
+.btn-hero:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+.btn-secondary {
+  @apply px-6 py-2 rounded-2xl font-medium transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(45, 26, 26, 0.8) 0%,
+    rgba(45, 26, 26, 0.6) 50%,
+    rgba(45, 26, 26, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg,
+    rgba(55, 35, 35, 0.85) 0%,
+    rgba(55, 35, 35, 0.65) 50%,
+    rgba(55, 35, 35, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  color: var(--accent);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Hero secondary button for homepage */
+.btn-hero-secondary {
+  @apply px-12 py-5 text-xl font-semibold rounded-3xl transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(45, 26, 26, 0.8) 0%,
+    rgba(45, 26, 26, 0.6) 50%,
+    rgba(45, 26, 26, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-hero-secondary:hover {
+  transform: translateY(-3px) scale(1.03);
+  background: linear-gradient(135deg,
+    rgba(55, 35, 35, 0.9) 0%,
+    rgba(55, 35, 35, 0.7) 50%,
+    rgba(55, 35, 35, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 16px 50px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  color: var(--accent);
+}
+
+.btn-hero-secondary:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+/* Accent button variant */
+.btn-accent {
+  @apply px-6 py-2 rounded-2xl text-white font-medium transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(0, 212, 255, 0.6) 0%,
+    rgba(0, 212, 255, 0.4) 50%,
+    rgba(0, 212, 255, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-accent:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg,
+    rgba(0, 212, 255, 0.7) 0%,
+    rgba(0, 212, 255, 0.5) 50%,
+    rgba(0, 212, 255, 0.7) 100%);
+  box-shadow:
+    0 12px 40px rgba(0, 212, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.btn-accent:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 4px 16px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Glassy success button */
+.btn-success {
+  @apply px-6 py-2 rounded-2xl text-white font-medium transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(34, 197, 94, 0.6) 0%,
+    rgba(34, 197, 94, 0.4) 50%,
+    rgba(34, 197, 94, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  box-shadow:
+    0 8px 32px rgba(34, 197, 94, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg,
+    rgba(34, 197, 94, 0.7) 0%,
+    rgba(34, 197, 94, 0.5) 50%,
+    rgba(34, 197, 94, 0.7) 100%);
+  box-shadow:
+    0 12px 40px rgba(34, 197, 94, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.btn-success:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 4px 16px rgba(34, 197, 94, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Glassy danger button */
+.btn-danger {
+  @apply px-6 py-2 rounded-2xl text-white font-medium transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(239, 68, 68, 0.6) 0%,
+    rgba(239, 68, 68, 0.4) 50%,
+    rgba(239, 68, 68, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  box-shadow:
+    0 8px 32px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg,
+    rgba(239, 68, 68, 0.7) 0%,
+    rgba(239, 68, 68, 0.5) 50%,
+    rgba(239, 68, 68, 0.7) 100%);
+  box-shadow:
+    0 12px 40px rgba(239, 68, 68, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 4px 16px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Click animation helper */
+.click-animate:active {
+  @apply transform scale-95 transition-transform;
+}
+
+/* Default button glassy effect */
+button:not([class*="btn-"]) {
+  @apply transition-all duration-300 ease-out;
+}
+
+button:not([class*="btn-"]):hover {
+  @apply transform scale-105;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(244, 91, 105, 0.15);
+}
+
+/* Glassy effect for navbar buttons and other interactive elements */
+.nav-button,
+.interactive-button {
+  @apply transition-all duration-300 ease-out relative overflow-hidden;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.08) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.nav-button:hover,
+.interactive-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.12) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}

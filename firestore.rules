@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------
+    // Users collection
+    // -------------------------------------------------------
+    match /users/{userId} {
+      // Anyone signed-in can read any user profile (needed for leaderboard, opponent profiles)
+      allow read: if request.auth != null;
+
+      // Users can create their own profile doc
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Users can update their own profile doc
+      allow update: if request.auth != null && request.auth.uid == userId;
+
+      // Matches can also update both players' docs via transactions
+      // (winner/loser stats). Allow update if the requester is authenticated.
+      allow update: if request.auth != null;
+    }
+
+    // -------------------------------------------------------
+    // Match rooms (matchmaking queue)
+    // -------------------------------------------------------
+    match /matchRooms/{roomId} {
+      // Any authenticated user can read rooms (needed for querying available rooms)
+      allow read: if request.auth != null;
+
+      // Any authenticated user can create a room (they add themselves to the queue)
+      allow create: if request.auth != null;
+
+      // Any authenticated user can update a room (joining an existing room)
+      allow update: if request.auth != null;
+
+      // Any authenticated user can delete a room (cleanup / cancel)
+      allow delete: if request.auth != null;
+    }
+
+    // -------------------------------------------------------
+    // Matches (active and completed ranked matches)
+    // -------------------------------------------------------
+    match /matches/{matchId} {
+      // Any authenticated user can read matches
+      allow read: if request.auth != null;
+
+      // Any authenticated user can create a match (created during matchmaking transaction)
+      allow create: if request.auth != null;
+
+      // Any authenticated user can update a match (submit solution, mark completed, award points)
+      allow update: if request.auth != null;
+
+      // Matches should not be deleted by clients
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------
+    // Problems (admin-managed coding problems)
+    // -------------------------------------------------------
+    match /problems/{problemId} {
+      // Anyone signed-in can read problems
+      allow read: if request.auth != null;
+
+      // Only allow writes if user is authenticated (admin check done server-side)
+      allow write: if request.auth != null;
+    }
+
+    // -------------------------------------------------------
+    // Matchmaking lock (used for atomic room join/create)
+    // -------------------------------------------------------
+    match /matchmaking/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

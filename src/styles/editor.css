@@ -1,0 +1,196 @@
+/* ===== Code editor and problem description styles ===== */
+
+/* Custom scrollbar for IDE panels */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(244, 91, 105, 0.15);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 91, 105, 0.3);
+}
+
+/* Custom font settings for problem description */
+.problem-description {
+  font-family: 'Inter', 'Source Sans Pro', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.01em;
+  text-rendering: optimizeLegibility;
+}
+
+.problem-title {
+  font-family: 'Space Grotesk', 'Georgia', serif;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.problem-paragraph {
+  line-height: 1.7;
+  margin-bottom: 1.2em;
+  font-size: 1.05rem;
+}
+
+/* Fix for code editor scrolling */
+.react-simple-code-editor {
+  min-height: 100%;
+  height: auto !important;
+}
+
+.react-simple-code-editor textarea {
+  outline: none !important;
+  overflow-y: auto !important;
+}
+
+/* Editor panel wrapper — animated gradient border */
+.editor-panel {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.editor-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(244, 91, 105, 0.2), rgba(0, 212, 255, 0.2), rgba(244, 91, 105, 0.2));
+  background-size: 200% 200%;
+  animation: gradient-x 6s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Active line highlight */
+.editor-active-line {
+  background: rgba(244, 91, 105, 0.04);
+  border-left: 2px solid rgba(244, 91, 105, 0.3);
+}
+
+/* PrismJS theme overrides (Dracula-inspired, refined) */
+pre {
+  background-color: rgba(18, 10, 10, 0.9) !important;
+  border-radius: 0.5rem;
+  overflow: auto;
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #f8f8f2 !important;
+  text-shadow: none !important;
+}
+
+.token.comment {
+  color: #6272a4 !important;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #bd93f9 !important;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #50fa7b !important;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #ff79c6 !important;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #ff79c6 !important;
+}
+
+.token.function,
+.token.class-name {
+  color: #8be9fd !important;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #f1fa8c !important;
+}
+
+/* ===== Editor Layout Responsive ===== */
+.editor-layout-problem {
+  width: 100%;
+  height: 40vh;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .editor-layout-problem {
+    width: var(--panel-w, 45%);
+    height: 100%;
+  }
+}
+
+/* Resizer handle */
+.editor-resizer {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 6px;
+  cursor: col-resize;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 20;
+  transition: background-color 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .editor-resizer {
+    display: flex;
+  }
+}
+
+.editor-resizer:hover {
+  background: rgba(244, 91, 105, 0.05);
+}
+
+.editor-resizer-bar {
+  width: 2px;
+  height: 32px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.editor-resizer:hover .editor-resizer-bar {
+  height: 48px;
+  background: rgba(244, 91, 105, 0.5);
+  box-shadow: 0 0 8px rgba(244, 91, 105, 0.4);
+}
+
+.editor-resizer:active .editor-resizer-bar {
+  background: rgba(244, 91, 105, 0.7);
+  box-shadow: 0 0 12px rgba(244, 91, 105, 0.5);
+}

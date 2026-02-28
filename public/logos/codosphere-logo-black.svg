@@ -1,0 +1,31 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main circle -->
+  <circle
+    cx="100"
+    cy="100"
+    r="90"
+    stroke="black"
+    stroke-width="8"
+    fill="none"
+  />
+  
+  <!-- First arrow -->
+  <path
+    d="M65 75L100 110L135 75"
+    stroke="black"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+  
+  <!-- Second arrow -->
+  <path
+    d="M65 125L100 90L135 125"
+    stroke="black"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+</svg>

@@ -1,0 +1,49 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="50" y1="50" x2="150" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f45b69" />
+      <stop offset="1" stop-color="#00d4ff" />
+    </linearGradient>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main circle -->
+  <circle
+    cx="100"
+    cy="100"
+    r="90"
+    stroke="url(#gradient)"
+    stroke-width="8"
+    fill="none"
+    filter="url(#glow)"
+  />
+  
+  <!-- First arrow -->
+  <path
+    d="M65 75L100 110L135 75"
+    stroke="url(#gradient)"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    filter="url(#glow)"
+  />
+  
+  <!-- Second arrow -->
+  <path
+    d="M65 125L100 90L135 125"
+    stroke="url(#gradient)"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+    filter="url(#glow)"
+  />
+</svg>

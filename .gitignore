@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+
+# Firebase cache
+.firebase/
+
+# Logs
+*.log
+
+# IDE / tool settings
+.claude/

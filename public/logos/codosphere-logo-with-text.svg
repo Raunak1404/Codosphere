@@ -1,0 +1,78 @@
+<svg width="600" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="50" y1="50" x2="150" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f45b69" />
+      <stop offset="1" stop-color="#00d4ff" />
+    </linearGradient>
+    
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f45b69" />
+      <stop offset="1" stop-color="#00d4ff" />
+    </linearGradient>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="textGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Logo -->
+  <g transform="translate(20, 20)">
+    <!-- Main circle -->
+    <circle
+      cx="80"
+      cy="80"
+      r="72"
+      stroke="url(#gradient)"
+      stroke-width="6"
+      fill="none"
+      filter="url(#glow)"
+    />
+    
+    <!-- First arrow -->
+    <path
+      d="M52 60L80 88L108 60"
+      stroke="url(#gradient)"
+      stroke-width="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+      filter="url(#glow)"
+    />
+    
+    <!-- Second arrow -->
+    <path
+      d="M52 100L80 72L108 100"
+      stroke="url(#gradient)"
+      stroke-width="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+      filter="url(#glow)"
+    />
+  </g>
+  
+  <!-- Text -->
+  <text 
+    x="200" 
+    y="120" 
+    font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" 
+    font-size="64" 
+    font-weight="bold" 
+    fill="url(#textGradient)"
+    filter="url(#textGlow)"
+  >
+    CodoSphere
+  </text>
+</svg>
