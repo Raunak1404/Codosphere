@@ -78,6 +78,54 @@ const CodeEditorPanel: React.FC<CodeEditorPanelProps> = ({
         </div>
 
         <EditorToolbar onReset={onResetCode} onCopy={onCopyCode} onDownload={onDownloadCode} />
+
+        <div className="w-px h-4 bg-white/[0.06]" />
+
+        {/* Submit button in toolbar */}
+        <div className="flex items-center gap-2">
+          {isSubmitting && (
+            <motion.span
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-medium"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+              Evaluating...
+            </motion.span>
+          )}
+
+          <motion.button
+            onClick={onSubmit}
+            disabled={isSubmitting || matchStatus === 'completed'}
+            className={`relative flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 overflow-hidden ${
+              isSubmitting || matchStatus === 'completed'
+                ? 'bg-white/[0.04] text-[var(--text-secondary)] cursor-not-allowed border border-white/[0.06]'
+                : 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-[0_0_15px_rgba(244,91,105,0.2)] hover:shadow-[0_0_25px_rgba(244,91,105,0.35)] border border-[var(--accent)]/30'
+            }`}
+            whileHover={!(isSubmitting || matchStatus === 'completed') ? { scale: 1.03 } : {}}
+            whileTap={!(isSubmitting || matchStatus === 'completed') ? { scale: 0.97 } : {}}
+          >
+            {!(isSubmitting || matchStatus === 'completed') && (
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer-sweep_3s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.1] to-transparent" />
+            )}
+            {isSubmitting ? (
+              <>
+                <Loader size={12} className="animate-spin" />
+                Running...
+              </>
+            ) : matchStatus === 'completed' ? (
+              <>
+                <Check size={12} />
+                Submitted
+              </>
+            ) : (
+              <>
+                <Play size={12} className="fill-current" />
+                Submit
+              </>
+            )}
+          </motion.button>
+        </div>
       </div>
 
       {/* Code Editor with ambient glow */}
@@ -108,58 +156,6 @@ const CodeEditorPanel: React.FC<CodeEditorPanelProps> = ({
           className="w-full h-full"
           textareaClassName="w-full h-full outline-none resize-none"
         />
-      </div>
-
-      {/* Submit bar — glassmorphic */}
-      <div className="relative flex items-center justify-between h-14 px-4 bg-[var(--secondary)]/60 backdrop-blur-sm border-t border-white/[0.06] flex-shrink-0">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
-
-        <div className="flex items-center gap-2 text-[10px] text-[var(--text-secondary)]">
-          {isSubmitting && (
-            <motion.span
-              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[var(--accent)]/10 text-[var(--accent)] font-medium"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-              Evaluating...
-            </motion.span>
-          )}
-        </div>
-
-        <motion.button
-          onClick={onSubmit}
-          disabled={isSubmitting || matchStatus === 'completed'}
-          className={`relative flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
-            isSubmitting || matchStatus === 'completed'
-              ? 'bg-white/[0.04] text-[var(--text-secondary)] cursor-not-allowed border border-white/[0.06]'
-              : 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-[0_0_20px_rgba(244,91,105,0.25)] hover:shadow-[0_0_30px_rgba(244,91,105,0.4)] border border-[var(--accent)]/30'
-          }`}
-          whileHover={!(isSubmitting || matchStatus === 'completed') ? { scale: 1.03, y: -1 } : {}}
-          whileTap={!(isSubmitting || matchStatus === 'completed') ? { scale: 0.97 } : {}}
-        >
-          {/* Shimmer effect */}
-          {!(isSubmitting || matchStatus === 'completed') && (
-            <div className="absolute inset-0 -translate-x-full animate-[shimmer-sweep_3s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.1] to-transparent" />
-          )}
-
-          {isSubmitting ? (
-            <>
-              <Loader size={14} className="animate-spin" />
-              Running...
-            </>
-          ) : matchStatus === 'completed' ? (
-            <>
-              <Check size={14} />
-              Submitted
-            </>
-          ) : (
-            <>
-              <Play size={14} className="fill-current" />
-              Submit
-            </>
-          )}
-        </motion.button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FileText, List, HelpCircle, Sparkles } from 'lucide-react';
 
 interface Tab {
@@ -61,114 +61,89 @@ const ProblemTabs: React.FC<ProblemTabsProps> = ({
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="p-4"
-          >
-            {activeTab === 'question' && (
-              <div className="prose prose-invert prose-sm max-w-none">
-                <div className="text-[var(--text)] leading-relaxed whitespace-pre-line text-[0.9rem] problem-description">
-                  {problem.description.split('\n\n').map((paragraph: string, i: number) => (
-                    <motion.p
-                      key={i}
-                      className="mb-3.5 leading-7"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: i * 0.05 }}
+        <div className="p-4">
+          {activeTab === 'question' && (
+            <div className="prose prose-invert prose-sm max-w-none">
+              <div className="text-[var(--text)] leading-relaxed whitespace-pre-line text-[0.9rem] problem-description">
+                {problem.description.split('\n\n').map((paragraph: string, i: number) => (
+                  <p key={i} className="mb-3.5 leading-7">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'examples' && (
+            <div>
+              {problem.examples && problem.examples.length > 0 ? (
+                <div className="space-y-3">
+                  {problem.examples.map((example, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.06] hover:border-white/[0.1] transition-colors duration-200"
                     >
-                      {paragraph}
-                    </motion.p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Sparkles size={12} className="text-[var(--accent)]" />
+                        <span className="text-xs font-bold text-white uppercase tracking-wider">Example {idx + 1}</span>
+                      </div>
+                      <div className="mb-3">
+                        <span className="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wider">Input</span>
+                        <div className="bg-black/40 p-3 rounded-lg mt-1.5 font-mono text-xs text-emerald-300 border border-emerald-500/10">
+                          {example.input}
+                        </div>
+                      </div>
+                      <div className="mb-3">
+                        <span className="text-[10px] text-[var(--accent-secondary)] font-bold uppercase tracking-wider">Output</span>
+                        <div className="bg-black/40 p-3 rounded-lg mt-1.5 font-mono text-xs text-[var(--accent-secondary)] border border-[var(--accent-secondary)]/10">
+                          {example.output}
+                        </div>
+                      </div>
+                      {example.explanation && (
+                        <div>
+                          <span className="text-[10px] text-[var(--accent-tertiary)] font-bold uppercase tracking-wider">Explanation</span>
+                          <div className="text-[var(--text-secondary)] mt-1.5 text-xs leading-relaxed bg-black/20 p-3 rounded-lg border border-[var(--accent-tertiary)]/10">
+                            {example.explanation}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-12 text-[var(--text-secondary)]">
+                  <List size={28} className="mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">No examples available.</p>
+                </div>
+              )}
+            </div>
+          )}
 
-            {activeTab === 'examples' && (
-              <div>
-                {problem.examples && problem.examples.length > 0 ? (
-                  <div className="space-y-3">
-                    {problem.examples.map((example, idx) => (
-                      <motion.div
+          {activeTab === 'constraints' && (
+            <div>
+              {problem.constraints && problem.constraints.length > 0 ? (
+                <div className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.06]">
+                  <ul className="space-y-2.5">
+                    {problem.constraints.map((constraint: string, idx: number) => (
+                      <li
                         key={idx}
-                        className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.06] hover:border-white/[0.1] transition-colors duration-200"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.08 }}
+                        className="flex items-start gap-2.5 text-[var(--text)] text-sm leading-relaxed"
                       >
-                        <div className="flex items-center gap-2 mb-3">
-                          <Sparkles size={12} className="text-[var(--accent)]" />
-                          <span className="text-xs font-bold text-white uppercase tracking-wider">Example {idx + 1}</span>
-                        </div>
-                        <div className="mb-3">
-                          <span className="text-[10px] text-[var(--accent)] font-bold uppercase tracking-wider">Input</span>
-                          <div className="bg-black/40 p-3 rounded-lg mt-1.5 font-mono text-xs text-emerald-300 border border-emerald-500/10">
-                            {example.input}
-                          </div>
-                        </div>
-                        <div className="mb-3">
-                          <span className="text-[10px] text-[var(--accent-secondary)] font-bold uppercase tracking-wider">Output</span>
-                          <div className="bg-black/40 p-3 rounded-lg mt-1.5 font-mono text-xs text-[var(--accent-secondary)] border border-[var(--accent-secondary)]/10">
-                            {example.output}
-                          </div>
-                        </div>
-                        {example.explanation && (
-                          <div>
-                            <span className="text-[10px] text-[var(--accent-tertiary)] font-bold uppercase tracking-wider">Explanation</span>
-                            <div className="text-[var(--text-secondary)] mt-1.5 text-xs leading-relaxed bg-black/20 p-3 rounded-lg border border-[var(--accent-tertiary)]/10">
-                              {example.explanation}
-                            </div>
-                          </div>
-                        )}
-                      </motion.div>
+                        <span className="w-1.5 h-1.5 mt-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
+                        <span className="text-xs">{constraint}</span>
+                      </li>
                     ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-[var(--text-secondary)]">
-                    <List size={28} className="mx-auto mb-3 opacity-30" />
-                    <p className="text-sm">No examples available.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'constraints' && (
-              <div>
-                {problem.constraints && problem.constraints.length > 0 ? (
-                  <motion.div
-                    className="bg-white/[0.02] rounded-xl p-4 border border-white/[0.06]"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <ul className="space-y-2.5">
-                      {problem.constraints.map((constraint: string, idx: number) => (
-                        <motion.li
-                          key={idx}
-                          className="flex items-start gap-2.5 text-[var(--text)] text-sm leading-relaxed"
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.06 }}
-                        >
-                          <span className="w-1.5 h-1.5 mt-1.5 rounded-full bg-[var(--accent)] flex-shrink-0" />
-                          <span className="text-xs">{constraint}</span>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ) : (
-                  <div className="text-center py-12 text-[var(--text-secondary)]">
-                    <HelpCircle size={28} className="mx-auto mb-3 opacity-30" />
-                    <p className="text-sm">No constraints specified.</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+                  </ul>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-[var(--text-secondary)]">
+                  <HelpCircle size={28} className="mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">No constraints specified.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
