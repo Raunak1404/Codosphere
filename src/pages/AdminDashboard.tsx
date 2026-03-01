@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Settings, BarChart3, AlertTriangle } from 'lucide-react';
-import Navbar from '../components/common/Navbar';
+import AdminNavbar from '../components/admin/AdminNavbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
 import ProblemTable from '../components/admin/ProblemTable';
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
-        <Navbar />
+        <AdminNavbar />
         <main className="flex-grow py-12">
           <div className="container-custom">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>

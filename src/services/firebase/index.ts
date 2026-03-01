@@ -15,4 +15,10 @@ export {
   getPublicProblems,
   uploadProblemFile,
 } from './problems';
+export {
+  getAllPlayers,
+  banPlayer,
+  deletePlayer,
+} from './playerManagement';
+export type { PlayerData } from './playerManagement';
 export { auth, db, storage, app } from '../../config/firebase';

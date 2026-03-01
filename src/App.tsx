@@ -19,6 +19,7 @@ const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
 const StatsPage = lazy(() => import('./pages/StatsPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminPlayerManagement = lazy(() => import('./pages/AdminPlayerManagement'));
 
 // Components
 import AdminRoute from './components/admin/AdminRoute';
@@ -126,6 +127,11 @@ function App() {
           <Route path="/admin" element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          } />
+          <Route path="/admin/players" element={
+            <AdminRoute>
+              <AdminPlayerManagement />
             </AdminRoute>
           } />
         </Routes>
