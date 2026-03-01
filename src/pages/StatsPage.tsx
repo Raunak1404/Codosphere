@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart2, Clock, Award, Star, Calendar, ArrowUp, CheckSquare, TrendingUp, Target } from 'lucide-react';
+import {
+  BarChart2, Clock, Award, Star, Calendar, CheckSquare, TrendingUp,
+  Target, Sparkles, Zap, ArrowRight, Lock, Crown
+} from 'lucide-react';
 import Trophy from '../components/icons/Trophy';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
@@ -10,6 +13,7 @@ import AnimatedProgressBar from '../components/common/AnimatedProgressBar';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile } from '../services/firebase';
 import { codingProblems } from '../data/codingProblems';
+import '../styles/study.css';
 
 // Define achievements with criteria - same as in ProfilePage
 const achievementsList = [
@@ -223,13 +227,25 @@ const StatsPage = () => {
       <PageTransition>
         <div className="min-h-screen flex flex-col">
           <Navbar />
-          <main className="flex-grow py-16">
-            <div className="container-custom">
-              <div className="card p-8 text-center">
-                <h2 className="text-2xl font-bold mb-4">Please Log In</h2>
+          <main className="flex-grow py-16 relative">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-[30%] left-[40%] w-[400px] h-[400px] rounded-full bg-[var(--accent)] filter blur-[160px] opacity-[0.04]" />
+            </div>
+            <div className="container-custom relative z-10 flex items-center justify-center min-h-[60vh]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="topic-card p-10 text-center max-w-md"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center mx-auto mb-5">
+                  <Lock className="text-[var(--accent)]" size={28} />
+                </div>
+                <h2 className="text-2xl font-bold font-display mb-3">Please Log In</h2>
                 <p className="text-[var(--text-secondary)] mb-6">You need to be logged in to view your stats</p>
-                <a href="/login" className="btn-primary inline-block">Log In</a>
-              </div>
+                <a href="/login" className="btn-primary inline-flex items-center gap-2">
+                  Log In <ArrowRight size={16} />
+                </a>
+              </motion.div>
             </div>
           </main>
           <Footer />
@@ -240,169 +256,239 @@ const StatsPage = () => {
 
   const difficultyStats = getDifficultyStats();
   const categoryStats = getCategoryStats();
+  const totalSolved = stats.solvedProblems.length;
+  const totalProblems = codingProblems.length;
+  const progressPercent = totalProblems > 0 ? Math.round((totalSolved / totalProblems) * 100) : 0;
 
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
-        <main className="flex-grow py-12">
-          <div className="container-custom">
+        <main className="flex-grow relative">
+          {/* Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[10%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.04]" />
+            <div className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] rounded-full bg-[var(--accent-secondary)] filter blur-[160px] opacity-[0.03]" />
+            <div className="study-hex-grid opacity-[0.01]" />
+          </div>
+
+          <div className="container-custom relative z-10 py-12">
+            {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.5 }}
+              className="mb-10"
             >
-              <div className="flex items-center mb-8">
-                <BarChart2 className="text-[var(--accent)] mr-3" size={28} />
-                <h1 className="text-3xl font-bold font-display tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--text)] to-[var(--text-secondary)]">Your Statistics</h1>
-              </div>
-              
-              {loading ? (
-                <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--accent)]"></div>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20">
+                  <BarChart2 className="text-[var(--accent)]" size={22} />
                 </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {[
-                      { 
-                        title: "Problems Solved", 
-                        value: stats.problemsSolved.toString(), 
-                        icon: <CheckSquare className="text-[var(--accent)]" size={20} />,
-                        change: `${stats.problemsSolved > 0 ? '+' : ''}${stats.problemsSolved} total` 
-                      },
-                      { 
-                        title: "Coding Streak", 
-                        value: `${stats.currentStreak} days`, 
-                        icon: <TrendingUp className="text-[var(--accent)]" size={20} />,
-                        change: `Best: ${stats.bestStreak} days` 
-                      },
-                      { 
-                        title: "Avg. Solve Time", 
-                        value: stats.averageSolveTime > 0 ? `${Math.round(stats.averageSolveTime / 60)} min` : '-- min', 
-                        icon: <Clock className="text-[var(--accent)]" size={20} />,
-                        change: stats.averageSolveTime > 0 ? `${stats.averageSolveTime} seconds` : 'No data yet' 
-                      },
-                      { 
-                        title: "Current Rank", 
-                        value: stats.rank || (stats.totalRankPoints > 0 ? "Bronze" : "Unranked"), 
-                        icon: <Target className="text-[var(--accent)]" size={20} />,
-                        change: `${stats.totalRankPoints} Rank Points` 
-                      }
-                    ].map((stat, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                        className="card-interactive"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <h2 className="text-[var(--text-secondary)] text-sm font-medium">{stat.title}</h2>
+                <h1 className="text-3xl font-bold font-display tracking-tight">
+                  Your{' '}
+                  <span className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
+                    Statistics
+                  </span>
+                </h1>
+              </div>
+              {/* Overall progress bar */}
+              <div className="mt-4 max-w-md">
+                <div className="flex justify-between items-center text-sm mb-1.5">
+                  <span className="text-[var(--text-secondary)]">Overall Progress</span>
+                  <span className="font-medium text-[var(--accent)]">{progressPercent}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] xp-bar-glow"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+              
+            {loading ? (
+              <div className="flex justify-center items-center py-24">
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-full border-2 border-white/[0.06]" />
+                  <div className="absolute inset-0 w-14 h-14 rounded-full border-2 border-transparent border-t-[var(--accent)] animate-spin" />
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Stat Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                  {[
+                    { 
+                      title: "Problems Solved", 
+                      value: stats.problemsSolved.toString(), 
+                      icon: <CheckSquare size={18} />,
+                      sub: `${stats.problemsSolved > 0 ? '+' : ''}${stats.problemsSolved} total`,
+                      color: 'var(--accent)',
+                    },
+                    { 
+                      title: "Coding Streak", 
+                      value: `${stats.currentStreak} days`, 
+                      icon: <TrendingUp size={18} />,
+                      sub: `Best: ${stats.bestStreak} days`,
+                      color: 'var(--accent-tertiary)',
+                    },
+                    { 
+                      title: "Avg. Solve Time", 
+                      value: stats.averageSolveTime > 0 ? `${Math.round(stats.averageSolveTime / 60)} min` : '-- min', 
+                      icon: <Clock size={18} />,
+                      sub: stats.averageSolveTime > 0 ? `${stats.averageSolveTime} seconds` : 'No data yet',
+                      color: 'var(--accent-secondary)',
+                    },
+                    { 
+                      title: "Current Rank", 
+                      value: stats.rank || (stats.totalRankPoints > 0 ? "Bronze" : "Unranked"), 
+                      icon: <Target size={18} />,
+                      sub: `${stats.totalRankPoints} Rank Points`,
+                      color: 'var(--accent)',
+                    }
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.08 }}
+                      className="topic-card p-5 group hover:border-white/[0.12] transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">{stat.title}</span>
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                          style={{
+                            background: `${stat.color}15`,
+                            color: stat.color,
+                          }}
+                        >
                           {stat.icon}
                         </div>
-                        <p className="text-2xl font-bold font-display mb-1">{stat.value}</p>
-                        <p className="text-xs text-[var(--text-secondary)]">{stat.change}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="card-interactive lg:col-span-1">
-                      <div className="flex items-center mb-4">
-                        <Trophy className="text-[var(--accent)] mr-2" size={20} />
-                        <h2 className="text-xl font-bold font-display">Your Rankings</h2>
+                      </div>
+                      <p className="text-2xl font-bold font-display mb-0.5">{stat.value}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{stat.sub}</p>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                {/* Main Grid: Rankings + Problem Solving */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                  {/* Rankings Sidebar */}
+                  <RevealOnScroll delay={0.05}>
+                    <div className="topic-card p-6 h-full">
+                      <div className="flex items-center gap-2 mb-5">
+                        <Trophy className="text-[var(--accent)]" size={18} />
+                        <h2 className="text-lg font-bold font-display">Rankings</h2>
                       </div>
                       
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {[
-                          { category: "Country", rank: "Unranked", total: "??" },
-                          { category: "Local Area", rank: "Unranked", total: "??" },
-                          { category: "Friends", rank: "Unranked", total: "??" }
+                          { category: "Country", rank: "Unranked", total: "??", icon: "🌍" },
+                          { category: "Local Area", rank: "Unranked", total: "??", icon: "📍" },
+                          { category: "Friends", rank: "Unranked", total: "??", icon: "👥" }
                         ].map((ranking, index) => (
-                          <div key={index} className="bg-[var(--primary)] p-4 rounded-lg">
+                          <div key={index} className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-colors">
                             <div className="flex justify-between items-center">
-                              <span className="text-[var(--text-secondary)]">{ranking.category}</span>
+                              <div className="flex items-center gap-2.5">
+                                <span className="text-lg">{ranking.icon}</span>
+                                <span className="text-sm text-[var(--text-secondary)]">{ranking.category}</span>
+                              </div>
                               <div className="text-right">
-                                <p className="font-semibold">{ranking.rank}</p>
-                                <p className="text-xs text-[var(--text-secondary)]">of {ranking.total}</p>
+                                <p className="font-semibold text-sm">{ranking.rank}</p>
+                                <p className="text-[10px] text-[var(--text-secondary)]">of {ranking.total}</p>
                               </div>
                             </div>
                           </div>
                         ))}
                       </div>
                       
-                      <div className="mt-4 pt-4 border-t border-gray-800">
-                        <p className="text-sm text-[var(--text-secondary)]">
+                      <div className="mt-5 pt-4 border-t border-white/[0.04]">
+                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                           Solve coding problems to improve your rank in the global leaderboards.
                         </p>
                       </div>
                     </div>
-                    
-                    <div className="card-interactive lg:col-span-2">
-                      <div className="flex items-center mb-6">
-                        <Star className="text-[var(--accent)] mr-2" size={20} />
-                        <h2 className="text-xl font-bold font-display">Problem Solving</h2>
+                  </RevealOnScroll>
+                  
+                  {/* Problem Solving Panel */}
+                  <RevealOnScroll delay={0.1} className="lg:col-span-2">
+                    <div className="topic-card p-6">
+                      <div className="flex items-center gap-2 mb-6">
+                        <Star className="text-[var(--accent)]" size={18} />
+                        <h2 className="text-lg font-bold font-display">Problem Solving</h2>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        {Object.entries(difficultyStats).map(([difficulty, stats], index) => (
-                          <div key={index} className="bg-[var(--primary)] p-4 rounded-lg">
-                            <h3 className={`text-sm font-medium mb-2 ${
-                              difficulty === 'Easy' ? 'text-green-400' :
-                              difficulty === 'Medium' ? 'text-yellow-400' :
-                              'text-red-400'
-                            }`}>
-                              {difficulty}
-                            </h3>
-                            <div className="flex justify-between items-center">
-                              <span className="text-2xl font-bold">{stats.solved}</span>
-                              <span className="text-xs text-[var(--text-secondary)]">of {stats.total} solved</span>
-                            </div>
-                            <AnimatedProgressBar 
-                              value={stats.total > 0 ? (stats.solved / stats.total) * 100 : 0}
-                              variant={difficulty === 'Easy' ? 'green' : difficulty === 'Medium' ? 'gold' : 'accent'}
-                              height={8}
-                              showGlow={true}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="bg-[var(--primary)] p-4 rounded-lg mb-4">
-                        <h3 className="text-sm font-medium mb-3">Problem Categories</h3>
-                        <div className="space-y-3">
-                          {categoryStats.map(([category, stats], index) => (
-                            <div key={index}>
-                              <div className="flex justify-between items-center text-sm mb-1">
-                                <span>{category}</span>
-                                <span className="text-[var(--text-secondary)]">{stats.solved}/{stats.total}</span>
+                      {/* Difficulty Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+                        {Object.entries(difficultyStats).map(([difficulty, dStats], index) => {
+                          const color = difficulty === 'Easy' ? '#34d399' : difficulty === 'Medium' ? '#fbbf24' : '#f87171';
+                          const pct = dStats.total > 0 ? Math.round((dStats.solved / dStats.total) * 100) : 0;
+                          return (
+                            <div key={index} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color }}>{difficulty}</span>
+                                <span className="text-[10px] text-[var(--text-secondary)]">{pct}%</span>
+                              </div>
+                              <div className="flex items-baseline gap-1.5 mb-2.5">
+                                <span className="text-2xl font-bold font-display">{dStats.solved}</span>
+                                <span className="text-xs text-[var(--text-secondary)]">/ {dStats.total}</span>
                               </div>
                               <AnimatedProgressBar 
-                                value={stats.total > 0 ? (stats.solved / stats.total) * 100 : 0}
-                                variant="cyan"
+                                value={dStats.total > 0 ? (dStats.solved / dStats.total) * 100 : 0}
+                                variant={difficulty === 'Easy' ? 'green' : difficulty === 'Medium' ? 'gold' : 'accent'}
                                 height={6}
+                                showGlow={true}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      {/* Categories */}
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] mb-4">
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <Zap size={14} className="text-[var(--accent-secondary)]" />
+                          Problem Categories
+                        </h3>
+                        <div className="space-y-3">
+                          {categoryStats.map(([category, cStats], index) => (
+                            <div key={index}>
+                              <div className="flex justify-between items-center text-sm mb-1">
+                                <span className="text-[var(--text-secondary)]">{category}</span>
+                                <span className="text-xs font-medium">{cStats.solved}/{cStats.total}</span>
+                              </div>
+                              <AnimatedProgressBar 
+                                value={cStats.total > 0 ? (cStats.solved / cStats.total) * 100 : 0}
+                                variant="cyan"
+                                height={5}
                               />
                             </div>
                           ))}
                         </div>
                       </div>
                       
-                      <div className="bg-[var(--primary)] p-4 rounded-lg">
-                        <h3 className="text-sm font-medium mb-3">Recent Activity</h3>
+                      {/* Recent Activity */}
+                      <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <Calendar size={14} className="text-[var(--accent-tertiary)]" />
+                          Recent Activity
+                        </h3>
                         {stats.solvedProblems.length > 0 ? (
                           <div className="space-y-2">
                             {codingProblems
                               .filter(p => stats.solvedProblems.includes(p.id))
                               .slice(0, 5)
                               .map((problem, index) => (
-                                <div key={index} className="flex items-center justify-between">
+                                <div key={index} className="flex items-center justify-between py-1.5 border-b border-white/[0.03] last:border-0">
                                   <span className="text-sm">{problem.title}</span>
-                                  <span className={`text-xs ${
-                                    problem.difficulty === 'Easy' ? 'text-green-400' :
-                                    problem.difficulty === 'Medium' ? 'text-yellow-400' :
-                                    'text-red-400'
+                                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                    problem.difficulty === 'Easy' ? 'text-emerald-400 bg-emerald-400/10' :
+                                    problem.difficulty === 'Medium' ? 'text-amber-400 bg-amber-400/10' :
+                                    'text-rose-400 bg-rose-400/10'
                                   }`}>
                                     {problem.difficulty}
                                   </span>
@@ -410,11 +496,11 @@ const StatsPage = () => {
                               ))}
                           </div>
                         ) : (
-                          <div className="flex justify-center items-center py-6">
+                          <div className="flex justify-center items-center py-8">
                             <div className="text-center">
-                              <Calendar className="mx-auto text-[var(--text-secondary)] mb-3" size={24} />
-                              <p className="text-[var(--text-secondary)]">No recent activity</p>
-                              <p className="text-xs text-[var(--text-secondary)] mt-1">
+                              <Calendar className="mx-auto text-[var(--text-secondary)] mb-2 opacity-40" size={28} />
+                              <p className="text-sm text-[var(--text-secondary)]">No recent activity</p>
+                              <p className="text-xs text-[var(--text-secondary)] mt-1 opacity-60">
                                 Start solving problems to see your activity
                               </p>
                             </div>
@@ -422,195 +508,212 @@ const StatsPage = () => {
                         )}
                       </div>
                     </div>
+                  </RevealOnScroll>
+                </div>
+                
+                {/* Achievements Section */}
+                <RevealOnScroll direction="up">
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-[var(--accent-tertiary)]/10 border border-[var(--accent-tertiary)]/20">
+                      <Award className="text-[var(--accent-tertiary)]" size={20} />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold font-display tracking-tight">Achievements & Badges</h2>
+                      <p className="text-xs text-[var(--text-secondary)]">{userAchievements.length} of {achievementsList.length} earned</p>
+                    </div>
                   </div>
                   
-                  <RevealOnScroll direction="up" className="mt-8">
-                    <div className="flex items-center mb-6">
-                      <Award className="text-[var(--accent)] mr-2" size={24} />
-                      <h2 className="text-2xl font-bold font-display tracking-tight">Achievements & Badges</h2>
-                    </div>
-                    
-                    <div className="card-interactive">
-                      <div className="mb-6">
-                        <h3 className="text-lg font-semibold font-display mb-4">Showcased Achievements</h3>
-                        <p className="text-sm text-[var(--text-secondary)] mb-4">
-                          Select up to 3 achievements to showcase on your profile. Click on an earned achievement to toggle showcase status.
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {achievementsList
-                            .filter(achievement => selectedAchievements.includes(achievement.id))
-                            .map((achievement) => {
-                              const isEarned = userAchievements.includes(achievement.id);
-                              return (
-                                <motion.div 
-                                  key={achievement.id}
-                                  className={`flex items-center p-4 rounded-xl cursor-pointer ${
-                                    isEarned ? 'bg-[var(--accent)] bg-opacity-15 border border-[var(--accent)] shadow-lg' : 'bg-[var(--primary)] opacity-60'
-                                  }`}
-                                  whileHover={{ scale: isEarned ? 1.02 : 1 }}
-                                  onClick={() => toggleAchievement(achievement.id)}
-                                >
-                                  <div className="w-10 h-10 rounded-full bg-[var(--secondary)] flex items-center justify-center mr-4 text-xl">
-                                    <span>{achievement.icon}</span>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium text-base">{achievement.name}</p>
-                                    <p className="text-sm text-[var(--text-secondary)]">{achievement.description}</p>
-                                    <div className="mt-1 text-xs text-[var(--accent)]">Showcased</div>
-                                  </div>
-                                </motion.div>
-                              );
-                            })}
-                        </div>
+                  {/* Showcased */}
+                  <div className="topic-card p-6 mb-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Crown size={16} className="text-[var(--accent-tertiary)]" />
+                        <h3 className="text-sm font-semibold font-display">Showcased</h3>
                       </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {achievementsList.map((achievement) => {
-                          let progress = 0;
-                          let total = 0;
-                          
-                          for (const [key, value] of Object.entries(achievement.criteria)) {
-                            if (key === 'rank') {
-                              const rankOrder = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
-                              const currentRankIndex = rankOrder.indexOf(stats.rank || '');
-                              const targetRankIndex = rankOrder.indexOf(value as string);
-                              
-                              if (currentRankIndex >= targetRankIndex && targetRankIndex >= 0) {
-                                progress = 1;
-                                total = 1;
-                              } else {
-                                progress = 0;
-                                total = 1;
-                              }
-                            } else {
-                              const stat = stats[key as keyof typeof stats] as number || 0;
-                              progress = Math.min(stat, value as number);
-                              total = value as number;
-                            }
-                          }
-                          
-                          const earned = userAchievements.includes(achievement.id);
-                          const isSelected = selectedAchievements.includes(achievement.id);
-                          
+                      <span className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">
+                        Select up to 3
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {achievementsList
+                        .filter(achievement => selectedAchievements.includes(achievement.id))
+                        .map((achievement) => {
+                          const isEarned = userAchievements.includes(achievement.id);
                           return (
-                            <div 
-                              key={achievement.id} 
-                              className={`bg-[var(--primary)] p-4 rounded-lg border cursor-pointer ${
-                                earned ? (isSelected ? 'border-[var(--accent)]' : 'border-transparent') : 'border-transparent opacity-60'
+                            <motion.div 
+                              key={achievement.id}
+                              className={`flex items-center p-4 rounded-xl cursor-pointer border transition-all duration-300 ${
+                                isEarned 
+                                  ? 'bg-[var(--accent)]/[0.08] border-[var(--accent)]/30 shadow-[0_0_20px_rgba(244,91,105,0.1)]' 
+                                  : 'bg-white/[0.02] border-white/[0.04] opacity-50'
                               }`}
-                              onClick={() => earned && toggleAchievement(achievement.id)}
+                              whileHover={{ scale: isEarned ? 1.02 : 1 }}
+                              onClick={() => toggleAchievement(achievement.id)}
                             >
-                              <div className="flex items-start">
-                                <div className="w-10 h-10 rounded-full bg-[var(--secondary)] flex items-center justify-center mr-3 text-xl">
-                                  {achievement.icon}
-                                </div>
-                                <div>
-                                  <h3 className="font-medium text-sm mb-1">{achievement.name}</h3>
-                                  <p className="text-xs text-[var(--text-secondary)] mb-2">{achievement.description}</p>
-                                  
-                                  <div className="w-full bg-gray-800 rounded-full h-1.5 mb-1">
-                                    <div 
-                                      className={`h-1.5 rounded-full ${earned ? 'bg-green-400' : 'bg-[var(--accent)]'}`} 
-                                      style={{width: total > 0 ? `${(progress / total) * 100}%` : '0%'}}
-                                    ></div>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <p className="text-xs text-[var(--text-secondary)]">
-                                      {progress}/{total}
-                                    </p>
-                                    {earned && (
-                                      <span className="text-xs text-green-400 flex items-center">
-                                        Earned
-                                        {isSelected && (
-                                          <span className="ml-1 bg-[var(--accent)] bg-opacity-20 px-1 py-0.5 rounded text-[var(--accent)] text-xs">
-                                            ★
-                                          </span>
-                                        )}
-                                      </span>
-                                    )}
-                                  </div>
+                              <div className="w-11 h-11 rounded-xl bg-white/[0.05] flex items-center justify-center mr-3 text-xl shrink-0">
+                                {achievement.icon}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-sm">{achievement.name}</p>
+                                <p className="text-xs text-[var(--text-secondary)] truncate">{achievement.description}</p>
+                                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-medium text-[var(--accent)]">
+                                  <Sparkles size={10} /> Showcased
                                 </div>
                               </div>
-                            </div>
+                            </motion.div>
                           );
                         })}
-                      </div>
                     </div>
-                  </RevealOnScroll>
-                </>
-              )}
-            </motion.div>
+                  </div>
+                  
+                  {/* All Achievements Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {achievementsList.map((achievement) => {
+                      let progress = 0;
+                      let total = 0;
+                      
+                      for (const [key, value] of Object.entries(achievement.criteria)) {
+                        if (key === 'rank') {
+                          const rankOrder = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+                          const currentRankIndex = rankOrder.indexOf(stats.rank || '');
+                          const targetRankIndex = rankOrder.indexOf(value as string);
+                          
+                          if (currentRankIndex >= targetRankIndex && targetRankIndex >= 0) {
+                            progress = 1;
+                            total = 1;
+                          } else {
+                            progress = 0;
+                            total = 1;
+                          }
+                        } else {
+                          const stat = stats[key as keyof typeof stats] as number || 0;
+                          progress = Math.min(stat, value as number);
+                          total = value as number;
+                        }
+                      }
+                      
+                      const earned = userAchievements.includes(achievement.id);
+                      const isSelected = selectedAchievements.includes(achievement.id);
+                      const pct = total > 0 ? (progress / total) * 100 : 0;
+                      
+                      return (
+                        <motion.div 
+                          key={achievement.id} 
+                          className={`topic-card p-4 cursor-pointer transition-all duration-300 ${
+                            !earned ? 'opacity-50 grayscale-[30%]' : ''
+                          } ${isSelected ? '!border-[var(--accent)]/30 shadow-[0_0_15px_rgba(244,91,105,0.08)]' : ''}`}
+                          onClick={() => earned && toggleAchievement(achievement.id)}
+                          whileHover={{ y: earned ? -3 : 0 }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${
+                              earned ? 'bg-[var(--accent)]/10' : 'bg-white/[0.03]'
+                            }`}>
+                              {achievement.icon}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-semibold text-sm mb-0.5">{achievement.name}</h3>
+                              <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed mb-2">{achievement.description}</p>
+                              
+                              {/* Progress bar */}
+                              <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden mb-1">
+                                <motion.div
+                                  className={`h-full rounded-full ${earned ? 'bg-emerald-400' : 'bg-[var(--accent)]'}`}
+                                  initial={{ width: 0 }}
+                                  whileInView={{ width: `${pct}%` }}
+                                  viewport={{ once: true }}
+                                  transition={{ duration: 0.8, delay: 0.1 }}
+                                />
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <p className="text-[10px] text-[var(--text-secondary)]">{progress}/{total}</p>
+                                {earned && (
+                                  <span className="text-[10px] font-medium text-emerald-400 flex items-center gap-0.5">
+                                    Earned
+                                    {isSelected && (
+                                      <Star size={8} className="text-[var(--accent)] fill-[var(--accent)]" />
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </RevealOnScroll>
+              </>
+            )}
           </div>
         </main>
         
         <Footer />
       </div>
       
+      {/* Achievement Banner */}
       <AnimatePresence>
         {showAchievementBanner && newAchievement && (
           <motion.div 
-            className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            transition={{ type: "spring", damping: 15, stiffness: 300 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+            initial={{ opacity: 0, y: 80, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 80, scale: 0.9 }}
+            transition={{ type: "spring", damping: 18, stiffness: 280 }}
           >
             <motion.div 
-              className="bg-gradient-to-r from-[var(--secondary)] to-[var(--accent)] p-6 rounded-xl shadow-xl flex items-center gap-5 relative overflow-hidden"
+              className="relative rounded-2xl border border-[var(--accent)]/30 bg-[var(--secondary)]/95 backdrop-blur-xl p-5 flex items-center gap-4 overflow-hidden shadow-[0_0_40px_rgba(244,91,105,0.2)]"
               animate={{ 
                 boxShadow: [
-                  "0 0 0px rgba(244, 91, 105, 0.3)",
-                  "0 0 30px rgba(244, 91, 105, 0.6)",
-                  "0 0 0px rgba(244, 91, 105, 0.3)"
+                  "0 0 20px rgba(244, 91, 105, 0.2)",
+                  "0 0 40px rgba(244, 91, 105, 0.4)",
+                  "0 0 20px rgba(244, 91, 105, 0.2)"
                 ]
               }}
               transition={{ duration: 2, repeat: 3 }}
             >
-              <motion.div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
+              {/* Ambient particles */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(12)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute w-2 h-2 rounded-full bg-white"
+                    className="absolute w-1 h-1 rounded-full bg-[var(--accent)]"
                     initial={{
-                      x: Math.random() * 100 + '%',
-                      y: Math.random() * 100 + '%',
+                      x: `${Math.random() * 100}%`,
+                      y: `${Math.random() * 100}%`,
                       opacity: 0
                     }}
                     animate={{
-                      x: [null, Math.random() * 100 + '%'],
-                      y: [null, Math.random() * 100 + '%'],
-                      opacity: [0, 0.7, 0]
+                      y: [null, `${Math.random() * -50}%`],
+                      opacity: [0, 0.6, 0]
                     }}
                     transition={{
-                      duration: 2 + Math.random() * 3,
+                      duration: 2 + Math.random() * 2,
                       repeat: Infinity,
                       repeatType: "loop"
                     }}
                   />
                 ))}
-              </motion.div>
+              </div>
               
               <motion.div
-                className="w-16 h-16 bg-[var(--secondary)] rounded-full flex items-center justify-center text-4xl shrink-0"
-                animate={{ 
-                  scale: [1, 1.2, 1],
-                  rotate: [0, 5, -5, 0]
-                }}
+                className="w-14 h-14 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center text-3xl shrink-0"
+                animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 1.5, repeat: 2 }}
               >
                 {newAchievement.icon}
               </motion.div>
               
-              <div className="text-left">
-                <motion.h3 
-                  className="text-xl font-bold"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.8, repeat: 3 }}
+              <div>
+                <motion.p
+                  className="text-xs font-semibold uppercase tracking-wider text-[var(--accent)] mb-0.5"
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
                 >
                   Achievement Unlocked!
-                </motion.h3>
-                <p className="text-lg font-medium">{newAchievement.name}</p>
-                <p className="text-sm text-[var(--text-secondary)]">{newAchievement.description}</p>
+                </motion.p>
+                <p className="text-base font-bold font-display">{newAchievement.name}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{newAchievement.description}</p>
               </div>
             </motion.div>
           </motion.div>
