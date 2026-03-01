@@ -19,46 +19,37 @@ const ParticleBackground = memo(() => {
     pauseOnOutsideViewport: true,
     particles: {
       number: {
-        value: 35,
+        value: 18,
         density: { enable: true, width: 1200, height: 800 },
       },
       color: {
         value: ['#f45b69', '#00d4ff', '#fbbf24'],
       },
       opacity: {
-        value: { min: 0.08, max: 0.2 },
+        value: { min: 0.06, max: 0.15 },
         animation: {
-          enable: true,
-          speed: 0.3,
-          sync: false,
+          enable: false,
         },
       },
       size: {
-        value: { min: 1, max: 2.5 },
+        value: { min: 1, max: 2 },
       },
       move: {
         enable: true,
-        speed: 0.4,
+        speed: 0.3,
         direction: 'none' as const,
         random: true,
         straight: false,
         outModes: { default: 'out' as const },
       },
       links: {
-        enable: true,
-        distance: 150,
-        color: '#f45b69',
-        opacity: 0.06,
-        width: 1,
+        enable: false,
       },
     },
     interactivity: {
       events: {
-        onHover: { enable: true, mode: 'repulse' },
+        onHover: { enable: false },
         resize: { enable: true },
-      },
-      modes: {
-        repulse: { distance: 100, duration: 0.4, speed: 0.5 },
       },
     },
   }), []);

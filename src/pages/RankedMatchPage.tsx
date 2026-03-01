@@ -12,6 +12,7 @@ import { joinMatchmaking, cancelMatchmaking, listenForMatch, getUserRecentMatche
 import UserRankCard from '../components/match/UserRankCard';
 import RecentMatchCard from '../components/match/RecentMatchCard';
 import AnimatedAvatar from '../components/common/AnimatedAvatar';
+import '../styles/study.css';
 
 const RankedMatchPage = () => {
   const { currentUser } = useAuth();
@@ -802,12 +803,15 @@ const RankedMatchPage = () => {
       <PageTransition>
         <div className="min-h-screen flex flex-col">
           <Navbar />
-          <main className="flex-grow py-12">
-            <div className="container-custom">
-              <div className="card text-center p-8">
-                <h2 className="text-2xl font-bold mb-4">Sign in to play ranked matches</h2>
-                <p className="text-[var(--text-secondary)] mb-6">You need to be logged in to participate in ranked matches and earn rank points.</p>
-                <a href="/login" className="btn-primary">Sign in</a>
+          <main className="flex-grow flex items-center justify-center py-12">
+            <div className="container-custom max-w-md">
+              <div className="topic-card text-center p-8">
+                <div className="mx-auto w-12 h-12 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center mb-4">
+                  <Shield className="text-[var(--accent)]" size={22} />
+                </div>
+                <h2 className="text-xl font-bold font-display mb-2">Sign in to play ranked matches</h2>
+                <p className="text-sm text-[var(--text-secondary)] mb-5">You need to be logged in to participate in ranked matches and earn rank points.</p>
+                <a href="/login" className="btn-primary text-sm py-2.5 px-6">Sign In</a>
               </div>
             </div>
           </main>
@@ -822,281 +826,286 @@ const RankedMatchPage = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
-        <main className="flex-grow py-12">
-          <div className="container-custom">
+        <main className="flex-grow relative">
+          {/* Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[10%] right-[15%] w-[450px] h-[450px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.03]" />
+            <div className="absolute bottom-[20%] left-[10%] w-[350px] h-[350px] rounded-full bg-[var(--accent-secondary)] filter blur-[150px] opacity-[0.02]" />
+            <div className="study-hex-grid opacity-[0.008]" />
+          </div>
+
+          <div className="container-custom relative z-10 py-12">
+            {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4 }}
+              className="mb-8"
             >
-              <div className="flex items-center mb-8">
-                <Swords className="text-[var(--accent)] mr-3" size={28} />
-                <h1 className="text-3xl font-bold font-display tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)]">Ranked Matches</h1>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left Column */}
-                <div className="lg:col-span-9 space-y-8">
-                  {/* Queue Card */}
-                  <motion.div 
-                    className="card-interactive overflow-hidden"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 }}
-                  >
-                    {searchingStatus === 'idle' ? (
-                      <>
-                        <h2 className="text-2xl font-bold font-display mb-2">Challenge another coder</h2>
-                        <p className="text-[var(--text-secondary)] mb-6">
-                          Compete in a 1v1 coding challenge against another player. Solve problems faster and more accurately to win the match and increase your rank.
-                        </p>
-                        
-                        <div className="bg-[var(--primary)] p-6 rounded-lg mb-6">
-                          <div className="flex flex-col sm:flex-row items-center justify-between">
-                            <div className="mb-4 sm:mb-0">
-                              <h3 className="text-lg font-semibold flex items-center">
-                                <Trophy className="text-[var(--accent)] mr-2" size={20} />
-                                Ranked Match Rules
-                              </h3>
-                              <ul className="mt-3 text-sm text-[var(--text-secondary)] space-y-2 list-disc pl-5">
-                                <li>Both players receive the same problem to solve</li>
-                                <li>The winner is determined by test cases passed and submission time</li>
-                                <li>Win to earn rank points and climb the leaderboard</li>
-                                <li>You have 10 minutes to solve the problem</li>
-                              </ul>
-                            </div>
-                            <div className="flex flex-col items-center">
-                              <p className="text-sm text-[var(--text-secondary)] mb-2">
-                                Win Reward
-                              </p>
-                              <div className="flex items-center gap-2 bg-[var(--secondary)] px-3 py-1 rounded-lg">
-                                <Trophy className="text-yellow-400" size={16} />
-                                <span className="text-yellow-400 font-medium">+1 Rank Point</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {error && (
-                          <div className="bg-red-500 bg-opacity-20 text-red-400 p-4 rounded-lg mb-6 flex items-center">
-                            <AlertCircle size={20} className="mr-2" />
-                            <span>{error}</span>
-                          </div>
-                        )}
-                        
-                        <motion.button
-                          className="btn-primary w-full py-4 text-lg font-bold flex items-center justify-center"
-                          onClick={handleJoinQueue}
-                          disabled={joining}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          {joining ? (
-                            <>
-                              <div className="h-5 w-5 border-2 border-t-transparent rounded-full mr-3 animate-spin"></div>
-                              Joining Queue...
-                            </>
-                          ) : (
-                            <>
-                              <Swords size={20} className="mr-2" />
-                              Find Match Now
-                            </>
-                          )}
-                        </motion.button>
-                      </>
-                    ) : searchingStatus === 'searching' ? (
-                      <>
-                        <div className="flex justify-between items-start">
-                          <h2 className="text-2xl font-bold">{searchingText}</h2>
-                          <div className="text-xl font-bold text-[var(--accent)]">
-                            {formatTime(searchTime)}
-                          </div>
-                        </div>
-                        
-                        {/* Radar-scan search animation */}
-                        <div className="relative h-40 my-8 bg-[var(--primary)] rounded-lg overflow-hidden">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="relative flex items-center justify-center">
-                              <AnimatedAvatar 
-                                type={avatarType}
-                                size={80}
-                                interval={5000}
-                              />
-                              
-                              {/* Radar scan rings */}
-                              <div className="radar-ring w-20 h-20"></div>
-                              <div className="radar-ring w-20 h-20"></div>
-                              <div className="radar-ring w-20 h-20"></div>
-                              <div className="radar-ring w-20 h-20"></div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="text-center mb-8">
-                          <p className="text-[var(--text-secondary)] mb-4">
-                            We're finding the best match for your skill level. This might take a moment...
-                          </p>
-                          
-                          <div className="h-2 bg-[var(--primary)] rounded-full overflow-hidden">
-                            <div className="h-full bg-[var(--accent)] animate-pulse w-full"></div>
-                          </div>
-                        </div>
-                        
-                        <motion.button
-                          className="btn-secondary w-full py-4 text-lg font-bold flex items-center justify-center"
-                          onClick={handleCancelSearch}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <UserMinus size={20} className="mr-2" />
-                          Cancel Search
-                        </motion.button>
-                      </>
-                    ) : (searchingStatus === 'found' || searchingStatus === 'battle-card') ? (
-                      <>
-                        <div className="text-center py-8">
-                          <div className="mb-6">
-                            <Swords size={60} className="mx-auto text-[var(--accent)]" />
-                          </div>
-                          
-                          <h2 className="text-3xl font-bold font-display mb-3">Match Found!</h2>
-                          <p className="text-[var(--text-secondary)] mb-8">
-                            Preparing your coding challenge...
-                          </p>
-                          
-                          <div className="h-2 bg-[var(--primary)] rounded-full overflow-hidden max-w-md mx-auto">
-                            <div className="h-full bg-[var(--accent)] animate-pulse w-full"></div>
-                          </div>
-                        </div>
-                      </>
-                    ) : null}
-                  </motion.div>
-                  
-                  {/* Recent Matches */}
-                  <motion.div 
-                    className="card-interactive"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.2 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-bold font-display">Recent Matches</h2>
-                      <button className="text-sm text-[var(--accent)] hover:text-[var(--accent-hover)]">View All</button>
-                    </div>
-                    
-                    {loadingMatches ? (
-                      <div className="flex justify-center py-8">
-                        <div className="w-10 h-10 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    ) : recentMatches.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {recentMatches.map(match => (
-                          <RecentMatchCard 
-                            key={match.id} 
-                            match={match} 
-                            currentUserId={currentUser?.uid || ''}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="bg-[var(--primary)] p-6 rounded-lg text-center">
-                        <p className="text-[var(--text-secondary)]">No recent matches</p>
-                        <p className="text-sm text-[var(--text-secondary)] mt-2">
-                          Complete your first ranked match to see your history.
-                        </p>
-                      </div>
-                    )}
-                  </motion.div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="p-2 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20">
+                  <Swords className="text-[var(--accent)]" size={22} />
                 </div>
-                
-                {/* Right Column */}
-                <div className="lg:col-span-3 space-y-6">
-                  {/* User Rank Card */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.3 }}
-                  >
-                    <UserRankCard />
-                  </motion.div>
-                  
-                  {/* Stats Card */}
-                  <motion.div 
-                    className="card-interactive"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.4 }}
-                  >
-                    <h3 className="text-lg font-semibold font-display mb-4">Your Stats</h3>
-                    
-                    <div className="space-y-4">
-                      <div className="bg-[var(--primary)] p-3 rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--text-secondary)]">Matches</span>
-                          <span className="font-medium">{userStats?.rankMatches || 0}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-[var(--primary)] p-3 rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--text-secondary)]">Wins</span>
-                          <span className="font-medium">{userStats?.rankWins || 0}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-[var(--primary)] p-3 rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--text-secondary)]">Win Rate</span>
-                          <span className="font-medium">
-                            {userStats?.rankMatches > 0 ? Math.round((userStats.rankWins / userStats.rankMatches) * 100) : 0}%
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-[var(--primary)] p-3 rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[var(--text-secondary)]">Rank Points</span>
-                          <span className="font-medium text-[var(--accent)]">{userStats?.totalRankPoints || 0}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                  
-                  {/* Quick Tips */}
-                  <motion.div 
-                    className="card-interactive"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.5 }}
-                  >
-                    <h3 className="text-lg font-semibold font-display mb-4">Quick Tips</h3>
-                    
-                    <div className="space-y-3 text-sm text-[var(--text-secondary)]">
-                      <p>
-                        ⚡️ Speed matters! Ties are broken by submission time.
-                      </p>
-                      <p>
-                        🎯 Make sure your solution passes all test cases.
-                      </p>
-                      <p>
-                        💪 Consistent wins will help you climb ranks faster.
-                      </p>
-                      <p>
-                        🏆 Reach Diamond rank to join exclusive tournaments.
-                      </p>
-                    </div>
-                  </motion.div>
+                <div>
+                  <h1 className="text-3xl font-bold font-display tracking-tight">
+                    Ranked <span className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent">Matches</span>
+                  </h1>
+                  <p className="text-xs text-[var(--text-secondary)]">Compete 1v1 and climb the leaderboard</p>
                 </div>
               </div>
             </motion.div>
+              
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column */}
+              <div className="lg:col-span-9 space-y-6">
+                {/* Queue Card */}
+                <motion.div 
+                  className="topic-card overflow-hidden"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.05 }}
+                >
+                  {searchingStatus === 'idle' ? (
+                    <div className="p-6">
+                      <h2 className="text-xl font-bold font-display mb-1.5">Challenge another coder</h2>
+                      <p className="text-sm text-[var(--text-secondary)] mb-5">
+                        Compete in a 1v1 coding challenge. Solve problems faster and more accurately to win and increase your rank.
+                      </p>
+                      
+                      <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-5 mb-5">
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                          <div>
+                            <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                              <div className="p-1.5 rounded-lg bg-amber-400/10 border border-amber-400/20">
+                                <Trophy className="text-amber-400" size={14} />
+                              </div>
+                              Ranked Match Rules
+                            </h3>
+                            <ul className="text-xs text-[var(--text-secondary)] space-y-1.5">
+                              <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[var(--accent)]" />Both players receive the same problem to solve</li>
+                              <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[var(--accent)]" />Winner determined by test cases passed & submission time</li>
+                              <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[var(--accent)]" />Win to earn rank points and climb the leaderboard</li>
+                              <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[var(--accent)]" />You have 10 minutes to solve the problem</li>
+                            </ul>
+                          </div>
+                          <div className="flex flex-col items-center shrink-0">
+                            <p className="text-[10px] uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Win Reward</p>
+                            <div className="flex items-center gap-1.5 bg-amber-400/10 border border-amber-400/20 px-3 py-1.5 rounded-lg">
+                              <Trophy className="text-amber-400" size={14} />
+                              <span className="text-amber-400 text-xs font-semibold">+1 Rank Point</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {error && (
+                        <div className="bg-rose-400/10 border border-rose-400/20 text-rose-400 p-3 rounded-xl mb-5 flex items-center gap-2 text-sm">
+                          <AlertCircle size={16} />
+                          <span>{error}</span>
+                        </div>
+                      )}
+                      
+                      <motion.button
+                        className="btn-primary w-full py-3.5 text-sm font-bold flex items-center justify-center rounded-xl"
+                        onClick={handleJoinQueue}
+                        disabled={joining}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                      >
+                        {joining ? (
+                          <>
+                            <div className="h-4 w-4 border-2 border-t-transparent rounded-full mr-2.5 animate-spin" />
+                            Joining Queue...
+                          </>
+                        ) : (
+                          <>
+                            <Swords size={18} className="mr-2" />
+                            Find Match Now
+                          </>
+                        )}
+                      </motion.button>
+                    </div>
+                  ) : searchingStatus === 'searching' ? (
+                    <div className="p-6">
+                      <div className="flex justify-between items-center mb-1">
+                        <h2 className="text-lg font-bold font-display">{searchingText}</h2>
+                        <div className="text-base font-bold text-[var(--accent)] font-mono">
+                          {formatTime(searchTime)}
+                        </div>
+                      </div>
+                      
+                      {/* Radar-scan search animation */}
+                      <div className="relative h-36 my-6 rounded-xl bg-white/[0.02] border border-white/[0.04] overflow-hidden">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="relative flex items-center justify-center">
+                            <AnimatedAvatar 
+                              type={avatarType}
+                              size={80}
+                              interval={5000}
+                            />
+                            
+                            {/* Radar scan rings */}
+                            <div className="radar-ring w-20 h-20"></div>
+                            <div className="radar-ring w-20 h-20"></div>
+                            <div className="radar-ring w-20 h-20"></div>
+                            <div className="radar-ring w-20 h-20"></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center mb-6">
+                        <p className="text-xs text-[var(--text-secondary)] mb-3">
+                          Finding the best match for your skill level...
+                        </p>
+                        
+                        <div className="h-1 rounded-full bg-white/[0.04] overflow-hidden max-w-xs mx-auto">
+                          <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] animate-pulse w-full rounded-full" />
+                        </div>
+                      </div>
+                      
+                      <motion.button
+                        className="w-full py-3 text-sm font-semibold flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-colors"
+                        onClick={handleCancelSearch}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                      >
+                        <UserMinus size={16} className="mr-2" />
+                        Cancel Search
+                      </motion.button>
+                    </div>
+                  ) : (searchingStatus === 'found' || searchingStatus === 'battle-card') ? (
+                    <div className="p-6">
+                      <div className="text-center py-6">
+                        <div className="mx-auto w-14 h-14 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center mb-4">
+                          <Swords size={28} className="text-[var(--accent)]" />
+                        </div>
+                        
+                        <h2 className="text-2xl font-bold font-display mb-2">Match Found!</h2>
+                        <p className="text-sm text-[var(--text-secondary)] mb-6">
+                          Preparing your coding challenge...
+                        </p>
+                        
+                        <div className="h-1 rounded-full bg-white/[0.04] overflow-hidden max-w-xs mx-auto">
+                          <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] animate-pulse w-full rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </motion.div>
+                
+                {/* Recent Matches */}
+                <motion.div 
+                  className="topic-card p-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold font-display">Recent Matches</h2>
+                  </div>
+                  
+                  {loadingMatches ? (
+                    <div className="flex flex-col items-center justify-center py-10">
+                      <div className="relative w-8 h-8 mb-2">
+                        <div className="w-8 h-8 rounded-full border-2 border-white/[0.06]" />
+                        <div className="absolute inset-0 w-8 h-8 rounded-full border-2 border-transparent border-t-[var(--accent)] animate-spin" />
+                      </div>
+                      <p className="text-xs text-[var(--text-secondary)]">Loading matches...</p>
+                    </div>
+                  ) : recentMatches.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      {recentMatches.map(match => (
+                        <RecentMatchCard 
+                          key={match.id} 
+                          match={match} 
+                          currentUserId={currentUser?.uid || ''}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-6 text-center">
+                      <p className="text-sm text-[var(--text-secondary)]">No recent matches</p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-1">
+                        Complete your first ranked match to see your history.
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              </div>
+              
+              {/* Right Column */}
+              <div className="lg:col-span-3 space-y-4">
+                {/* User Rank Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.15 }}
+                >
+                  <UserRankCard />
+                </motion.div>
+                
+                {/* Stats Card */}
+                <motion.div 
+                  className="topic-card p-5"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                >
+                  <h3 className="text-sm font-semibold font-display mb-3 flex items-center gap-2">
+                    <TrendingUp size={14} className="text-[var(--accent-secondary)]" />
+                    Your Stats
+                  </h3>
+                  
+                  <div className="space-y-2">
+                    {[
+                      { label: 'Matches', value: userStats?.rankMatches || 0, color: 'text-[var(--text)]' },
+                      { label: 'Wins', value: userStats?.rankWins || 0, color: 'text-emerald-400' },
+                      { label: 'Win Rate', value: `${userStats?.rankMatches > 0 ? Math.round((userStats.rankWins / userStats.rankMatches) * 100) : 0}%`, color: 'text-[var(--text)]' },
+                      { label: 'Rank Points', value: userStats?.totalRankPoints || 0, color: 'text-[var(--accent)]' },
+                    ].map((stat) => (
+                      <div key={stat.label} className="rounded-lg bg-white/[0.02] border border-white/[0.04] px-3 py-2.5">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-[var(--text-secondary)]">{stat.label}</span>
+                          <span className={`text-sm font-semibold ${stat.color}`}>{stat.value}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+                
+                {/* Quick Tips */}
+                <motion.div 
+                  className="topic-card p-5"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.25 }}
+                >
+                  <h3 className="text-sm font-semibold font-display mb-3 flex items-center gap-2">
+                    <Zap size={14} className="text-amber-400" />
+                    Quick Tips
+                  </h3>
+                  
+                  <div className="space-y-2.5">
+                    {[
+                      { emoji: '⚡️', text: 'Speed matters! Ties are broken by submission time.' },
+                      { emoji: '🎯', text: 'Make sure your solution passes all test cases.' },
+                      { emoji: '💪', text: 'Consistent wins help you climb ranks faster.' },
+                      { emoji: '🏆', text: 'Reach Diamond rank to join exclusive tournaments.' },
+                    ].map((tip, i) => (
+                      <div key={i} className="rounded-lg bg-white/[0.02] border border-white/[0.04] px-3 py-2 text-xs text-[var(--text-secondary)]">
+                        <span className="mr-1.5">{tip.emoji}</span>{tip.text}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
           </div>
         </main>
         
         <Footer />
 
-        {/* Battle Card — rendered via portal (not wrapped in AnimatePresence
-            because portals render outside the React tree and AnimatePresence
-            can't track their enter/exit correctly) */}
+        {/* Battle Card — rendered via portal */}
         {renderBattleCard()}
       </div>
     </PageTransition>

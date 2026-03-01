@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Edit2, Camera, Check, X, Trophy, Star, Calendar, Target, Upload } from 'lucide-react';
+import { User, Edit2, Camera, Check, X, Trophy, Star, Calendar, Target, Upload, Shield, Zap, Award, ArrowRight } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
-import RevealOnScroll from '../components/common/RevealOnScroll';
 import AnimatedAvatar from '../components/common/AnimatedAvatar';
 import UserRankCard from '../components/match/UserRankCard';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile, uploadProfileImage } from '../services/firebase';
+import '../styles/study.css';
 
 // Define achievements with criteria
 const achievementsList = [
@@ -229,10 +229,16 @@ const ProfilePage = () => {
           <Navbar />
           <main className="flex-grow py-16">
             <div className="container-custom">
-              <div className="card p-8 text-center">
-                <h2 className="text-2xl font-bold mb-4">Please Log In</h2>
-                <p className="text-[var(--text-secondary)] mb-6">You need to be logged in to view your profile</p>
-                <a href="/login" className="btn-primary inline-block">Log In</a>
+              <div className="topic-card p-10 text-center max-w-md mx-auto">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center mx-auto mb-5">
+                  <Shield size={28} className="text-[var(--accent)]" />
+                </div>
+                <h2 className="text-xl font-bold font-display mb-2">Please Log In</h2>
+                <p className="text-sm text-[var(--text-secondary)] mb-6">You need to be logged in to view your profile</p>
+                <a href="/login" className="btn-primary inline-flex items-center gap-2">
+                  Log In
+                  <ArrowRight size={16} />
+                </a>
               </div>
             </div>
           </main>
@@ -248,7 +254,10 @@ const ProfilePage = () => {
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--accent)]"></div>
+            <div className="relative w-12 h-12">
+              <div className="w-12 h-12 rounded-full border-2 border-white/[0.06]" />
+              <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-[var(--accent)] animate-spin" />
+            </div>
           </main>
           <Footer />
         </div>
@@ -261,262 +270,289 @@ const ProfilePage = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
-        <main className="flex-grow py-12 relative overflow-hidden">
-          <div className="container-custom relative z-10">
+        <main className="flex-grow relative">
+          {/* Background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[10%] left-[15%] w-[450px] h-[450px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.03]" />
+            <div className="absolute bottom-[20%] right-[10%] w-[350px] h-[350px] rounded-full bg-[var(--accent-secondary)] filter blur-[160px] opacity-[0.02]" />
+            <div className="study-hex-grid opacity-[0.008]" />
+          </div>
+
+          <div className="container-custom relative z-10 py-12">
+            {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4 }}
+              className="mb-8"
             >
-              <div className="flex items-center mb-8">
-                <User className="text-[var(--accent)] mr-3" size={28} />
-                <h1 className="text-3xl font-bold font-display tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--text)] to-[var(--text-secondary)]">Your Profile</h1>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Profile Card - Moved further left */}
-                <div className="lg:col-span-3 space-y-6">
-                  <motion.div 
-                    className="card-interactive text-center"
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="relative inline-block mb-6">
-                      {profileData.profileImage ? (
-                        <div className="relative">
-                          <img
-                            src={profileData.profileImage}
-                            alt="Profile"
-                            className="w-32 h-32 rounded-full object-cover border-4 border-[var(--accent)] shadow-lg"
-                          />
-                          <label
-                            htmlFor="profile-image-upload"
-                            className="absolute bottom-0 right-0 bg-[var(--accent)] rounded-full p-2 cursor-pointer hover:bg-[var(--accent-hover)] transition-colors shadow-lg"
-                          >
-                            {uploadingImage ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                            ) : (
-                              <Camera size={16} className="text-white" />
-                            )}
-                          </label>
-                        </div>
-                      ) : (
-                        <div className="relative">
-                          <AnimatedAvatar 
-                            type={profileData.selectedAvatar}
-                            size={128}
-                            interval={8000}
-                          />
-                          <label
-                            htmlFor="profile-image-upload"
-                            className="absolute bottom-0 right-0 bg-[var(--accent)] rounded-full p-2 cursor-pointer hover:bg-[var(--accent-hover)] transition-colors shadow-lg"
-                          >
-                            {uploadingImage ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                            ) : (
-                              <Upload size={16} className="text-white" />
-                            )}
-                          </label>
-                        </div>
-                      )}
-                      <input
-                        id="profile-image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                        disabled={uploadingImage}
-                      />
-                    </div>
-                    
-                    {editing ? (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-1">Display Name</label>
-                          <input
-                            type="text"
-                            value={editForm.name}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                            className="w-full px-3 py-2 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)]"
-                            placeholder="Enter your display name"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-1">Coder Name</label>
-                          <input
-                            type="text"
-                            value={editForm.coderName}
-                            onChange={(e) => setEditForm(prev => ({ ...prev, coderName: e.target.value }))}
-                            className="w-full px-3 py-2 bg-[var(--primary)] rounded-lg border border-gray-700 focus:outline-none focus:border-[var(--accent)]"
-                            placeholder="Enter your coder name"
-                          />
-                        </div>
-                        
-                        <div>
-                          <label className="block text-sm font-medium mb-3">Avatar Style</label>
-                          <div className="grid grid-cols-2 gap-3">
-                            {(['boy1', 'boy2', 'girl1', 'girl2'] as const).map((avatarType) => (
-                              <div
-                                key={avatarType}
-                                className={`cursor-pointer p-2 rounded-lg border-2 transition-all ${
-                                  editForm.selectedAvatar === avatarType 
-                                    ? 'border-[var(--accent)] bg-[var(--accent)] bg-opacity-20' 
-                                    : 'border-gray-700 hover:border-[var(--accent)] hover:border-opacity-50'
-                                }`}
-                                onClick={() => setEditForm(prev => ({ ...prev, selectedAvatar: avatarType }))}
-                              >
-                                <AnimatedAvatar 
-                                  type={avatarType}
-                                  size={50}
-                                  interval={5000 + Math.random() * 3000}
-                                  selected={editForm.selectedAvatar === avatarType}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <div className="flex space-x-2 pt-4">
-                          <button onClick={handleSaveProfile} className="btn-primary flex-1 flex items-center justify-center">
-                            <Check size={16} className="mr-1" />
-                            Save
-                          </button>
-                          <button onClick={handleCancelEdit} className="btn-secondary flex-1 flex items-center justify-center">
-                            <X size={16} className="mr-1" />
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <h2 className="text-2xl font-bold font-display mb-1">{profileData.name || 'Anonymous Coder'}</h2>
-                        {profileData.coderName && (
-                          <p className="text-[var(--accent)] font-medium mb-4">@{profileData.coderName}</p>
-                        )}
-                        <p className="text-[var(--text-secondary)] mb-6">{currentUser.email}</p>
-                        
-                        <button onClick={handleEditProfile} className="btn-primary flex items-center justify-center w-full">
-                          <Edit2 size={16} className="mr-2" />
-                          Edit Profile
-                        </button>
-                      </>
-                    )}
-                  </motion.div>
-                  
-                  {/* Achievement Showcase Section */}
-                  <motion.div 
-                    className="card-interactive"
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    <div className="flex items-center mb-4">
-                      <Trophy className="text-[var(--accent)] mr-2" size={20} />
-                      <h3 className="text-lg font-semibold font-display">Showcased Achievements</h3>
-                    </div>
-                    
-                    {showcasedAchievements.length > 0 ? (
-                      <div className="space-y-3">
-                        {achievementsList
-                          .filter(achievement => showcasedAchievements.includes(achievement.id))
-                          .slice(0, 3) // Only show first 3
-                          .map((achievement) => {
-                            const isEarned = userAchievements.includes(achievement.id);
-                            return (
-                              <motion.div 
-                                key={achievement.id}
-                                className={`flex items-center p-3 rounded-lg ${
-                                  isEarned ? 'bg-[var(--accent)] bg-opacity-15 border border-[var(--accent)]' : 'bg-[var(--primary)] opacity-60'
-                                }`}
-                                whileHover={{ scale: 1.02 }}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                              >
-                                <div className="w-8 h-8 rounded-full bg-[var(--secondary)] flex items-center justify-center mr-3 text-lg">
-                                  <span>{achievement.icon}</span>
-                                </div>
-                                <div className="flex-1">
-                                  <p className="font-medium text-sm">{achievement.name}</p>
-                                  <p className="text-xs text-[var(--text-secondary)]">{achievement.description}</p>
-                                </div>
-                                {isEarned && (
-                                  <div className="text-xs text-green-400">✓</div>
-                                )}
-                              </motion.div>
-                            );
-                          })}
-                      </div>
-                    ) : (
-                      <div className="text-center py-6">
-                        <Trophy className="mx-auto text-[var(--text-secondary)] mb-2" size={24} />
-                        <p className="text-sm text-[var(--text-secondary)]">No achievements showcased</p>
-                        <p className="text-xs text-[var(--text-secondary)] mt-1">
-                          Visit your stats page to select achievements to showcase
-                        </p>
-                      </div>
-                    )}
-                    
-                    <div className="mt-4 pt-4 border-t border-gray-700">
-                      <a 
-                        href="/stats" 
-                        className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] block text-center"
-                      >
-                        Manage achievements in Stats →
-                      </a>
-                    </div>
-                  </motion.div>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20">
+                  <User className="text-[var(--accent)]" size={22} />
                 </div>
-                
-                {/* Stats and Other Content - More Space */}
-                <div className="lg:col-span-9 space-y-8">
-                  {/* Rank Card */}
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    <UserRankCard />
-                  </motion.div>
-                  
-                  {/* Quick Stats Grid */}
-                  <motion.div 
-                    className="grid grid-cols-1 md:grid-cols-3 gap-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    {[
-                      { 
-                        title: "Problems Solved", 
-                        value: profileData.stats.problemsSolved, 
-                        icon: <Target className="text-[var(--accent)]" size={24} /> 
-                      },
-                      { 
-                        title: "Current Streak", 
-                        value: `${profileData.stats.currentStreak} days`, 
-                        icon: <Calendar className="text-[var(--accent)]" size={24} /> 
-                      },
-                      { 
-                        title: "Best Streak", 
-                        value: `${profileData.stats.bestStreak} days`, 
-                        icon: <Star className="text-[var(--accent)]" size={24} /> 
-                      }
-                    ].map((stat, index) => (
-                      <div key={index} className="card-interactive text-center">
-                        <div className="flex justify-center mb-3">
-                          {stat.icon}
-                        </div>
-                        <h3 className="text-2xl font-bold font-display mb-1">{stat.value}</h3>
-                        <p className="text-[var(--text-secondary)] text-sm">{stat.title}</p>
-                      </div>
-                    ))} 
-                  </motion.div>
+                <div>
+                  <h1 className="text-3xl font-bold font-display tracking-tight">
+                    Your <span className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent">Profile</span>
+                  </h1>
+                  <p className="text-xs text-[var(--text-secondary)]">Manage your identity and track your progress</p>
                 </div>
               </div>
             </motion.div>
+              
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Profile Card */}
+              <div className="lg:col-span-4 space-y-5">
+                <motion.div 
+                  className="topic-card p-6 text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.05 }}
+                >
+                  <div className="relative inline-block mb-5">
+                    {profileData.profileImage ? (
+                      <div className="relative">
+                        <div className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-[var(--accent)]/30 shadow-lg shadow-[var(--accent)]/10">
+                          <img
+                            src={profileData.profileImage}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <label
+                          htmlFor="profile-image-upload"
+                          className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-[var(--accent)] flex items-center justify-center cursor-pointer hover:bg-[var(--accent-hover)] transition-colors shadow-lg"
+                        >
+                          {uploadingImage ? (
+                            <div className="w-4 h-4 rounded-full border-2 border-transparent border-t-white animate-spin" />
+                          ) : (
+                            <Camera size={14} className="text-white" />
+                          )}
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <div className="rounded-2xl overflow-hidden border-2 border-white/[0.06]">
+                          <AnimatedAvatar 
+                            type={profileData.selectedAvatar}
+                            size={112}
+                            interval={8000}
+                          />
+                        </div>
+                        <label
+                          htmlFor="profile-image-upload"
+                          className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl bg-[var(--accent)] flex items-center justify-center cursor-pointer hover:bg-[var(--accent-hover)] transition-colors shadow-lg"
+                        >
+                          {uploadingImage ? (
+                            <div className="w-4 h-4 rounded-full border-2 border-transparent border-t-white animate-spin" />
+                          ) : (
+                            <Upload size={14} className="text-white" />
+                          )}
+                        </label>
+                      </div>
+                    )}
+                    <input
+                      id="profile-image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                  </div>
+                  
+                  {editing ? (
+                    <div className="space-y-4 text-left">
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Display Name</label>
+                        <input
+                          type="text"
+                          value={editForm.name}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                          className="w-full px-3 py-2.5 bg-white/[0.03] rounded-xl border border-white/[0.06] focus:outline-none focus:border-[var(--accent)]/40 text-sm transition-colors"
+                          placeholder="Enter your display name"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">Coder Name</label>
+                        <input
+                          type="text"
+                          value={editForm.coderName}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, coderName: e.target.value }))}
+                          className="w-full px-3 py-2.5 bg-white/[0.03] rounded-xl border border-white/[0.06] focus:outline-none focus:border-[var(--accent)]/40 text-sm transition-colors"
+                          placeholder="Enter your coder name"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2">Avatar Style</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {(['boy1', 'boy2', 'girl1', 'girl2'] as const).map((avatarType) => (
+                            <div
+                              key={avatarType}
+                              className={`cursor-pointer p-2 rounded-xl border transition-all ${
+                                editForm.selectedAvatar === avatarType 
+                                  ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10' 
+                                  : 'border-white/[0.06] hover:border-white/[0.12]'
+                              }`}
+                              onClick={() => setEditForm(prev => ({ ...prev, selectedAvatar: avatarType }))}
+                            >
+                              <AnimatedAvatar 
+                                type={avatarType}
+                                size={50}
+                                interval={5000 + Math.random() * 3000}
+                                selected={editForm.selectedAvatar === avatarType}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2 pt-2">
+                        <button onClick={handleSaveProfile} className="btn-primary flex-1 flex items-center justify-center py-2.5">
+                          <Check size={14} className="mr-1.5" />
+                          Save
+                        </button>
+                        <button onClick={handleCancelEdit} className="btn-secondary flex-1 flex items-center justify-center py-2.5">
+                          <X size={14} className="mr-1.5" />
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h2 className="text-xl font-bold font-display mb-0.5">{profileData.name || 'Anonymous Coder'}</h2>
+                      {profileData.coderName && (
+                        <p className="text-sm text-[var(--accent)] font-medium mb-1">@{profileData.coderName}</p>
+                      )}
+                      <p className="text-xs text-[var(--text-secondary)] mb-5">{currentUser.email}</p>
+                      
+                      <button onClick={handleEditProfile} className="btn-primary flex items-center justify-center w-full py-2.5 text-sm group">
+                        <Edit2 size={14} className="mr-2" />
+                        Edit Profile
+                      </button>
+                    </>
+                  )}
+                </motion.div>
+                
+                {/* Achievement Showcase */}
+                <motion.div 
+                  className="topic-card p-5"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <Trophy className="text-amber-400" size={16} />
+                    <h3 className="text-sm font-semibold font-display">Showcased Achievements</h3>
+                  </div>
+                  
+                  {showcasedAchievements.length > 0 ? (
+                    <div className="space-y-2">
+                      {achievementsList
+                        .filter(achievement => showcasedAchievements.includes(achievement.id))
+                        .slice(0, 3)
+                        .map((achievement) => {
+                          const isEarned = userAchievements.includes(achievement.id);
+                          return (
+                            <div 
+                              key={achievement.id}
+                              className={`flex items-center p-2.5 rounded-xl transition-colors ${
+                                isEarned 
+                                  ? 'bg-[var(--accent)]/10 border border-[var(--accent)]/20' 
+                                  : 'bg-white/[0.02] border border-white/[0.04] opacity-50'
+                              }`}
+                            >
+                              <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center mr-2.5 text-lg shrink-0">
+                                {achievement.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-xs truncate">{achievement.name}</p>
+                                <p className="text-[10px] text-[var(--text-secondary)] truncate">{achievement.description}</p>
+                              </div>
+                              {isEarned && (
+                                <Check size={14} className="text-emerald-400 ml-1 shrink-0" />
+                              )}
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-5">
+                      <Trophy className="mx-auto text-[var(--text-secondary)] opacity-30 mb-2" size={24} />
+                      <p className="text-xs text-[var(--text-secondary)]">No achievements showcased</p>
+                      <p className="text-[10px] text-[var(--text-secondary)] mt-1">
+                        Visit your stats page to select achievements
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="mt-4 pt-3 border-t border-white/[0.04]">
+                    <a 
+                      href="/stats" 
+                      className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] flex items-center justify-center gap-1 group"
+                    >
+                      Manage in Stats
+                      <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                    </a>
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Stats & Rank */}
+              <div className="lg:col-span-8 space-y-5">
+                {/* Rank Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                  <UserRankCard />
+                </motion.div>
+                
+                {/* Quick Stats Grid */}
+                <motion.div 
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.15 }}
+                >
+                  {[
+                    { 
+                      title: "Problems Solved", 
+                      value: profileData.stats.problemsSolved, 
+                      icon: <Target size={18} />,
+                      color: 'text-[var(--accent)]',
+                      bg: 'bg-[var(--accent)]/10 border-[var(--accent)]/20'
+                    },
+                    { 
+                      title: "Current Streak", 
+                      value: `${profileData.stats.currentStreak} days`, 
+                      icon: <Zap size={18} />,
+                      color: 'text-amber-400',
+                      bg: 'bg-amber-400/10 border-amber-400/20'
+                    },
+                    { 
+                      title: "Best Streak", 
+                      value: `${profileData.stats.bestStreak} days`, 
+                      icon: <Award size={18} />,
+                      color: 'text-[var(--accent-secondary)]',
+                      bg: 'bg-[var(--accent-secondary)]/10 border-[var(--accent-secondary)]/20'
+                    }
+                  ].map((stat, index) => (
+                    <div key={index} className="topic-card p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className={`w-9 h-9 rounded-xl ${stat.bg} border flex items-center justify-center ${stat.color}`}>
+                          {stat.icon}
+                        </div>
+                        <span className="text-xs text-[var(--text-secondary)] font-medium">{stat.title}</span>
+                      </div>
+                      <div className="text-2xl font-bold font-display">{stat.value}</div>
+                    </div>
+                  ))} 
+                </motion.div>
+              </div>
+            </div>
           </div>
         </main>
         
@@ -527,70 +563,23 @@ const ProfilePage = () => {
       <AnimatePresence>
         {showAchievementBanner && newAchievement && (
           <motion.div 
-            className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50"
-            initial={{ opacity: 0, y: 100 }}
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
+            initial={{ opacity: 0, y: 80 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            transition={{ type: "spring", damping: 15, stiffness: 300 }}
+            exit={{ opacity: 0, y: 80 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
-            <motion.div 
-              className="bg-gradient-to-r from-[var(--secondary)] to-[var(--accent)] p-6 rounded-xl shadow-xl flex items-center gap-5 relative overflow-hidden"
-              animate={{ 
-                boxShadow: [
-                  "0 0 0px rgba(244, 91, 105, 0.3)",
-                  "0 0 30px rgba(244, 91, 105, 0.6)",
-                  "0 0 0px rgba(244, 91, 105, 0.3)"
-                ]
-              }}
-              transition={{ duration: 2, repeat: 3 }}
-            >
-              <motion.div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-2 h-2 rounded-full bg-white"
-                    initial={{
-                      x: Math.random() * 100 + '%',
-                      y: Math.random() * 100 + '%',
-                      opacity: 0
-                    }}
-                    animate={{
-                      x: [null, Math.random() * 100 + '%'],
-                      y: [null, Math.random() * 100 + '%'],
-                      opacity: [0, 0.7, 0]
-                    }}
-                    transition={{
-                      duration: 2 + Math.random() * 3,
-                      repeat: Infinity,
-                      repeatType: "loop"
-                    }}
-                  />
-                ))}
-              </motion.div>
-              
-              <motion.div
-                className="w-16 h-16 bg-[var(--secondary)] rounded-full flex items-center justify-center text-4xl shrink-0"
-                animate={{ 
-                  scale: [1, 1.2, 1],
-                  rotate: [0, 5, -5, 0]
-                }}
-                transition={{ duration: 1.5, repeat: 2 }}
-              >
+            <div className="topic-card p-5 flex items-center gap-4 shadow-2xl shadow-[var(--accent)]/20 border-[var(--accent)]/20 min-w-[320px]">
+              <div className="w-12 h-12 rounded-xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center text-2xl shrink-0">
                 {newAchievement.icon}
-              </motion.div>
-              
-              <div className="text-left">
-                <motion.h3 
-                  className="text-xl font-bold"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 0.8, repeat: 3 }}
-                >
-                  Achievement Unlocked!
-                </motion.h3>
-                <p className="text-lg font-medium">{newAchievement.name}</p>
-                <p className="text-sm text-[var(--text-secondary)]">{newAchievement.description}</p>
               </div>
-            </motion.div>
+              
+              <div className="text-left min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent)] mb-0.5">Achievement Unlocked!</p>
+                <p className="text-sm font-bold font-display truncate">{newAchievement.name}</p>
+                <p className="text-xs text-[var(--text-secondary)] truncate">{newAchievement.description}</p>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
