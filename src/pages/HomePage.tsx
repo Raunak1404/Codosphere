@@ -174,7 +174,7 @@ const HomePage = () => {
                   {stats.map((s, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm"
+                      className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06]"
                     >
                       <span className="text-[var(--accent)]">{s.icon}</span>
                       <div>
@@ -195,13 +195,8 @@ const HomePage = () => {
               >
                 <div className="relative">
                   <motion.div
-                    className="rounded-2xl overflow-hidden border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm shadow-2xl"
-                    animate={{ y: [0, -8, 0], rotate: [0, 0.5, 0, -0.5, 0] }}
-                    transition={{
-                      y: { duration: 5, repeat: Infinity, ease: 'easeInOut' },
-                      rotate: { duration: 7, repeat: Infinity, ease: 'easeInOut' },
-                    }}
-                    whileHover={{ y: -12, transition: { duration: 0.3 } }}
+                    className="rounded-2xl overflow-hidden border border-white/[0.06] bg-white/[0.02] shadow-2xl"
+                    whileHover={{ y: -4, transition: { duration: 0.3 } }}
                   >
                     {/* Editor header */}
                     <div className="bg-black/40 px-4 py-3 flex items-center justify-between border-b border-white/[0.06]">
@@ -256,11 +251,7 @@ const HomePage = () => {
                       <div className="pl-4">{'}'}</div>
                       <div>{'}'}</div>
                       <div className="mt-3 flex items-center gap-2">
-                        <motion.span
-                          className="inline-block w-2 h-5 bg-[var(--accent)]"
-                          animate={{ opacity: [1, 0, 1] }}
-                          transition={{ duration: 1, repeat: Infinity }}
-                        />
+                      <div className="inline-block w-2 h-5 bg-[var(--accent)] animate-pulse" />
                       </div>
                     </div>
                     {/* Status bar */}
@@ -274,14 +265,8 @@ const HomePage = () => {
                   </motion.div>
 
                   {/* Ambient particles */}
-                  <motion.div className="absolute -top-3 -left-3 w-2 h-2 bg-[var(--accent)] rounded-full"
-                    animate={{ scale: [0, 1, 0], opacity: [0, 0.5, 0] }}
-                    transition={{ duration: 3.5, repeat: Infinity }}
-                  />
-                  <motion.div className="absolute -bottom-4 -right-4 w-3 h-3 bg-[var(--accent-secondary)] rounded-full"
-                    animate={{ scale: [0, 1, 0], opacity: [0, 0.4, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, delay: 1.5 }}
-                  />
+                  <motion.div className="absolute -top-3 -left-3 w-2 h-2 bg-[var(--accent)] rounded-full opacity-30" />
+                  <motion.div className="absolute -bottom-4 -right-4 w-3 h-3 bg-[var(--accent-secondary)] rounded-full opacity-20" />
                 </div>
               </motion.div>
             </div>
@@ -290,8 +275,6 @@ const HomePage = () => {
             <motion.div
               className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer"
               onClick={scrollToFeatures}
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
             >
               <span className="text-xs text-[var(--text-secondary)] mb-2">Discover more</span>
               <ChevronDown size={18} className="text-[var(--accent)]" />

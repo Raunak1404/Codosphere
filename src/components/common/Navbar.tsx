@@ -119,13 +119,7 @@ const Navbar = () => {
                     </span>
                     <span>{link.name}</span>
                     {location.pathname === link.path && (
-                      <motion.div
-                        className="h-[3px] w-full nav-indicator-active absolute -bottom-1 left-0"
-                        layoutId="navbar-indicator"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      />
+                      <div className="h-[3px] w-full nav-indicator-active absolute -bottom-1 left-0" />
                     )}
                   </Link>
                 ))}

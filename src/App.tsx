@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAuth } from './context/AuthContext';
 
 // Eager-loaded pages (common entry points)
@@ -24,8 +24,7 @@ const AdminPlayerManagement = lazy(() => import('./pages/AdminPlayerManagement')
 // Components
 import AdminRoute from './components/admin/AdminRoute';
 
-// Lazy-load heavy visual components (not needed for first paint)
-const ParticleBackground = lazy(() => import('./components/common/ParticleBackground'));
+// ParticleBackground removed for performance — @tsparticles is heavy
 
 // Branded page loader — logo pulse + shimmer text
 const PageLoader = () => (
@@ -75,14 +74,8 @@ function App() {
 
   return (
     <>
-      {/* Ambient particles — lazy-loaded, GPU-accelerated */}
-      <Suspense fallback={null}>
-        <ParticleBackground />
-      </Suspense>
-
-      <AnimatePresence mode="wait">
-        <Suspense fallback={<PageLoader />}>
-        <Routes location={location} key={location.pathname}>
+      <Suspense fallback={<PageLoader />}>
+        <Routes location={location}>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -136,7 +129,6 @@ function App() {
           } />
         </Routes>
       </Suspense>
-    </AnimatePresence>
     </>
   );
 }

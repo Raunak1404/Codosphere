@@ -7,7 +7,7 @@ import GlowText from './GlowText';
 
 const Footer = () => {
   return (
-    <footer className="relative bg-[var(--secondary)] bg-opacity-80 backdrop-blur-md mt-auto py-12">
+    <footer className="relative bg-[var(--secondary)] mt-auto py-12">
       {/* Gradient separator line at top */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-30" />
       <div className="container-custom">

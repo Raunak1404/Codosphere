@@ -1,20 +1,15 @@
 /* ===== Navbar and dropdown glass styles ===== */
 
 .liquid-glass-navbar {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: linear-gradient(135deg,
-    rgba(30, 18, 18, 0.92) 0%,
-    rgba(30, 18, 18, 0.85) 50%,
-    rgba(30, 18, 18, 0.92) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(30, 18, 18, 0.96);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 
-/* Animated gradient underline */
+/* Static gradient underline (no animation for perf) */
 .liquid-glass-navbar::after {
   content: '';
   position: absolute;
@@ -27,9 +22,7 @@
     var(--accent) 30%, 
     var(--accent-secondary) 70%, 
     transparent);
-  opacity: 0.4;
-  animation: gradient-x 8s ease infinite;
-  background-size: 200% auto;
+  opacity: 0.3;
 }
 
 /* Scrolled state — more opaque */
@@ -42,14 +35,9 @@
 }
 
 .dropdown-menu {
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  background: rgba(30, 18, 18, 0.95);
+  background: rgba(30, 18, 18, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.3),
-    0 10px 20px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 9999;
 }
