@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Edit2, Camera, Check, X, Trophy, Star, Calendar, Target, Upload, Shield, Zap, Award, ArrowRight, Flame, TrendingUp, Sparkles, Crown, Lock } from 'lucide-react';
+import { Edit2, Camera, Check, X, Trophy, Target, Shield, Zap, Award, ArrowRight, Flame, TrendingUp, Sparkles, Crown, Swords } from 'lucide-react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
@@ -50,7 +50,9 @@ const ProfilePage = () => {
       currentStreak: 0,
       bestStreak: 0,
       totalRankPoints: 0,
-      rank: 'Unranked'
+      rank: 'Unranked',
+      rankWins: 0,
+      rankMatches: 0
     }
   });
 
@@ -61,10 +63,8 @@ const ProfilePage = () => {
   });
 
   const [userAchievements, setUserAchievements] = useState<number[]>([]);
-  const [showcasedAchievements, setShowcasedAchievements] = useState<number[]>([1, 2]);
   const [showAchievementBanner, setShowAchievementBanner] = useState(false);
   const [newAchievement, setNewAchievement] = useState<any>(null);
-  const [achievementFilter, setAchievementFilter] = useState<'all' | 'earned' | 'locked'>('all');
 
   // Load user profile
   useEffect(() => {
@@ -86,12 +86,14 @@ const ProfilePage = () => {
           coderName: data.coderName || '',
           profileImage: data.profileImage || '',
           selectedAvatar: data.selectedAvatar || 'boy1',
-          stats: data.stats || {
-            problemsSolved: 0,
-            currentStreak: 0,
-            bestStreak: 0,
-            totalRankPoints: 0,
-            rank: 'Unranked'
+          stats: {
+            problemsSolved: data.stats?.problemsSolved || 0,
+            currentStreak: data.stats?.currentStreak || 0,
+            bestStreak: data.stats?.bestStreak || 0,
+            totalRankPoints: data.stats?.totalRankPoints || 0,
+            rank: data.stats?.rank || 'Unranked',
+            rankWins: data.stats?.rankWins || 0,
+            rankMatches: data.stats?.rankMatches || 0
           }
         });
         
@@ -102,7 +104,6 @@ const ProfilePage = () => {
         });
         
         setUserAchievements(data.achievements || []);
-        setShowcasedAchievements(data.showcasedAchievements || [1, 2]);
         
         // Check for new achievements
         const newlyEarnedAchievements = checkForNewAchievements(data);
@@ -165,8 +166,6 @@ const ProfilePage = () => {
       });
       
       setUserAchievements(updatedAchievements);
-      
-      console.log("New achievements saved:", newAchievements);
     } catch (error) {
       console.error("Failed to save achievements:", error);
     }
@@ -234,11 +233,17 @@ const ProfilePage = () => {
   const earnedCount = userAchievements.length;
   const totalCount = achievementsList.length;
 
-  const filteredAchievements = achievementsList.filter(a => {
-    if (achievementFilter === 'earned') return userAchievements.includes(a.id);
-    if (achievementFilter === 'locked') return !userAchievements.includes(a.id);
-    return true;
-  });
+  // Only the earned achievements (up to 3 most recent)
+  const earnedAchievementsList = useMemo(() => {
+    return achievementsList
+      .filter(a => userAchievements.includes(a.id))
+      .slice(-3); // Show last 3 earned
+  }, [userAchievements]);
+
+  // Win rate calculation
+  const winRate = profileData.stats.rankMatches > 0
+    ? Math.round((profileData.stats.rankWins / profileData.stats.rankMatches) * 100)
+    : 0;
 
   if (!currentUser) {
     return (
@@ -289,12 +294,10 @@ const ProfilePage = () => {
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background */}
+          {/* Lightweight background — fewer blurs */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[5%] left-[10%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[200px] opacity-[0.04]" />
             <div className="absolute bottom-[15%] right-[5%] w-[400px] h-[400px] rounded-full bg-[var(--accent-secondary)] filter blur-[180px] opacity-[0.03]" />
-            <div className="absolute top-[50%] left-[50%] w-[300px] h-[300px] rounded-full bg-[var(--accent-tertiary)] filter blur-[160px] opacity-[0.02]" />
-            <div className="study-hex-grid opacity-[0.008]" />
           </div>
 
           <div className="container-custom relative z-10 py-10">
@@ -310,7 +313,7 @@ const ProfilePage = () => {
                 {/* Gradient Banner Background */}
                 <div className="relative h-32 bg-gradient-to-r from-[var(--accent)]/20 via-[var(--accent-secondary)]/10 to-[var(--accent)]/20 overflow-hidden">
                   <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.03%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50" />
-                  {/* Decorative elements */}
+                  {/* Level badge */}
                   <div className="absolute top-4 right-6 flex items-center gap-2">
                     <div className="px-3 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5">
                       <Crown size={12} className="text-amber-400" />
@@ -321,10 +324,8 @@ const ProfilePage = () => {
 
                 {/* Profile Info Section */}
                 <div className="relative px-6 pb-6">
-                  {/* Avatar - positioned to overlap banner */}
                   <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 -mt-14">
                     <div className="relative flex-shrink-0">
-                      {/* Glow ring behind avatar */}
                       <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-secondary)] opacity-40 blur-sm" />
                       <div className="relative">
                         {profileData.profileImage ? (
@@ -344,7 +345,6 @@ const ProfilePage = () => {
                             />
                           </div>
                         )}
-                        {/* Upload button */}
                         <label
                           htmlFor="profile-image-upload"
                           className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-secondary)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg z-20"
@@ -355,7 +355,6 @@ const ProfilePage = () => {
                             <Camera size={14} className="text-white" />
                           )}
                         </label>
-                        {/* Level badge */}
                         <div className="absolute -top-1 -left-1 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-xs font-black text-black shadow-lg z-20">
                           {level}
                         </div>
@@ -472,11 +471,8 @@ const ProfilePage = () => {
             </motion.div>
 
             {/* ═══ STATS GRID ═══ */}
-            <motion.div 
+            <div 
               className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.08 }}
             >
               {[
                 { 
@@ -508,220 +504,201 @@ const ProfilePage = () => {
                   glow: 'shadow-purple-400/20'
                 }
               ].map((stat, index) => (
-                <motion.div 
+                <div 
                   key={index} 
-                  className={`topic-card p-5 relative overflow-hidden group shadow-lg ${stat.glow}`}
-                  whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                  className={`topic-card p-5 relative overflow-hidden group shadow-lg ${stat.glow} hover:-translate-y-1 transition-transform duration-200`}
                 >
-                  {/* Decorative gradient icon background */}
                   <div className={`absolute -top-2 -right-2 w-16 h-16 rounded-full bg-gradient-to-br ${stat.gradient} opacity-[0.08] group-hover:opacity-[0.15] transition-opacity`} />
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center mb-3 shadow-lg ${stat.glow}`}>
                     <span className="text-white">{stat.icon}</span>
                   </div>
                   <div className="text-2xl font-bold font-display mb-0.5">{stat.value}</div>
                   <div className="text-[11px] text-[var(--text-secondary)] font-medium">{stat.title}</div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
               
+            {/* ═══ MAIN CONTENT — 3-column layout ═══ */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* ═══ LEFT COLUMN - Rank & Showcase ═══ */}
-              <div className="lg:col-span-4 space-y-5">
-                {/* Rank Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.12 }}
-                >
-                  <UserRankCard />
-                </motion.div>
-
-                {/* Achievement Showcase */}
-                <motion.div 
-                  className="topic-card overflow-hidden"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.16 }}
-                >
-                  {/* Header with gradient */}
-                  <div className="px-5 pt-5 pb-3 border-b border-white/[0.04]">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-7 h-7 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center">
-                        <Sparkles className="text-amber-400" size={14} />
-                      </div>
-                      <h3 className="text-sm font-bold font-display">Showcased</h3>
-                    </div>
-                    <p className="text-[10px] text-[var(--text-secondary)] ml-9">Your pinned achievements</p>
-                  </div>
-                  
-                  <div className="p-4">
-                    {showcasedAchievements.length > 0 ? (
-                      <div className="space-y-2">
-                        {achievementsList
-                          .filter(achievement => showcasedAchievements.includes(achievement.id))
-                          .slice(0, 3)
-                          .map((achievement) => {
-                            const isEarned = userAchievements.includes(achievement.id);
-                            return (
-                              <div 
-                                key={achievement.id}
-                                className={`flex items-center p-3 rounded-xl transition-all ${
-                                  isEarned 
-                                    ? 'bg-gradient-to-r from-[var(--accent)]/[0.08] to-transparent border border-[var(--accent)]/20 shadow-sm shadow-[var(--accent)]/10' 
-                                    : 'bg-white/[0.02] border border-white/[0.04] opacity-50'
-                                }`}
-                              >
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-3 text-xl shrink-0 ${
-                                  isEarned ? 'bg-[var(--accent)]/10' : 'bg-white/[0.04]'
-                                }`}>
-                                  {achievement.icon}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-semibold text-xs truncate">{achievement.name}</p>
-                                  <p className="text-[10px] text-[var(--text-secondary)] truncate">{achievement.description}</p>
-                                </div>
-                                {isEarned && (
-                                  <div className="w-5 h-5 rounded-full bg-emerald-400/20 flex items-center justify-center ml-2 shrink-0">
-                                    <Check size={12} className="text-emerald-400" />
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                      </div>
-                    ) : (
-                      <div className="text-center py-6">
-                        <Trophy className="mx-auto text-[var(--text-secondary)] opacity-30 mb-2" size={24} />
-                        <p className="text-xs text-[var(--text-secondary)]">No achievements showcased</p>
-                      </div>
-                    )}
-                    
-                    <div className="mt-4 pt-3 border-t border-white/[0.04]">
-                      <a 
-                        href="/stats" 
-                        className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] flex items-center justify-center gap-1 group font-medium"
-                      >
-                        Manage in Stats
-                        <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                      </a>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
               
-              {/* ═══ RIGHT COLUMN - Achievements Gallery ═══ */}
-              <div className="lg:col-span-8">
-                <motion.div 
-                  className="topic-card overflow-hidden"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                >
-                  {/* Header */}
-                  <div className="px-6 pt-6 pb-4 border-b border-white/[0.04]">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500/20 to-violet-500/20 border border-purple-400/20 flex items-center justify-center">
-                          <Trophy className="text-purple-400" size={18} />
+              {/* ═══ LEFT COLUMN — Rank Card ═══ */}
+              <div className="lg:col-span-4 space-y-5">
+                <UserRankCard stats={profileData.stats} />
+              </div>
+
+              {/* ═══ CENTER COLUMN — Win Rate + Battle Stats ═══ */}
+              <div className="lg:col-span-4 space-y-5">
+                {/* Win Rate Card — Enhanced Design */}
+                <div className="topic-card overflow-hidden relative">
+                  {/* Animated ring background */}
+                  <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full border-4 border-[var(--accent)]/5" />
+                  <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full border-4 border-[var(--accent-secondary)]/5" />
+                  
+                  <div className="px-5 pt-5 pb-3 border-b border-white/[0.04]">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-600/20 border border-emerald-400/20 flex items-center justify-center">
+                        <Swords className="text-emerald-400" size={16} />
+                      </div>
+                      <h3 className="text-sm font-bold font-display">Battle Stats</h3>
+                    </div>
+                  </div>
+
+                  <div className="p-5">
+                    {/* Win Rate Circle */}
+                    <div className="flex justify-center mb-5">
+                      <div className="relative w-32 h-32">
+                        {/* Background ring */}
+                        <svg className="w-32 h-32 -rotate-90" viewBox="0 0 128 128">
+                          <circle cx="64" cy="64" r="56" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+                          <circle
+                            cx="64" cy="64" r="56"
+                            fill="none"
+                            stroke="url(#winRateGradient)"
+                            strokeWidth="10"
+                            strokeLinecap="round"
+                            strokeDasharray={`${winRate * 3.52} ${352 - winRate * 3.52}`}
+                            className="transition-all duration-1000 ease-out"
+                          />
+                          <defs>
+                            <linearGradient id="winRateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="var(--accent)" />
+                              <stop offset="50%" stopColor="var(--accent-secondary)" />
+                              <stop offset="100%" stopColor="#10b981" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        {/* Center text */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-3xl font-black font-display bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
+                            {winRate}%
+                          </span>
+                          <span className="text-[9px] uppercase tracking-[0.15em] text-[var(--text-secondary)] font-semibold mt-0.5">
+                            Win Rate
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Match stats grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="relative p-3 rounded-xl bg-gradient-to-br from-emerald-500/[0.06] to-transparent border border-emerald-400/10 text-center group hover:border-emerald-400/25 transition-colors">
+                        <div className="text-xs text-emerald-400 font-semibold mb-0.5 flex items-center justify-center gap-1">
+                          <Trophy size={11} />
+                          WINS
+                        </div>
+                        <div className="text-xl font-bold font-display">{profileData.stats.rankWins || 0}</div>
+                      </div>
+                      <div className="relative p-3 rounded-xl bg-gradient-to-br from-[var(--accent)]/[0.06] to-transparent border border-[var(--accent)]/10 text-center group hover:border-[var(--accent)]/25 transition-colors">
+                        <div className="text-xs text-[var(--accent)] font-semibold mb-0.5 flex items-center justify-center gap-1">
+                          <Swords size={11} />
+                          PLAYED
+                        </div>
+                        <div className="text-xl font-bold font-display">{profileData.stats.rankMatches || 0}</div>
+                      </div>
+                    </div>
+
+                    {/* Rank Points bar */}
+                    <div className="mt-4 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                      <div className="flex items-center justify-between text-[10px] mb-1.5">
+                        <span className="text-[var(--text-secondary)] font-medium flex items-center gap-1">
+                          <Zap size={10} className="text-[var(--accent-tertiary)]" />
+                          Rank Points
+                        </span>
+                        <span className="text-[var(--accent-tertiary)] font-bold">{profileData.stats.totalRankPoints} RP</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                        <div 
+                          className="h-full rounded-full bg-gradient-to-r from-[var(--accent-tertiary)] via-[var(--accent)] to-[var(--accent-secondary)]"
+                          style={{ width: `${Math.min(100, profileData.stats.totalRankPoints)}%`, transition: 'width 1s ease-out' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ═══ RIGHT COLUMN — Achievements Earned ═══ */}
+              <div className="lg:col-span-4 space-y-5">
+                {/* Earned Achievements Card — Enhanced */}
+                <div className="topic-card overflow-hidden relative">
+                  {/* Subtle decorative */}
+                  <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/5 to-purple-500/5" />
+                  
+                  <div className="px-5 pt-5 pb-3 border-b border-white/[0.04]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400/20 to-purple-500/20 border border-amber-400/20 flex items-center justify-center">
+                          <Award className="text-amber-400" size={16} />
                         </div>
                         <div>
-                          <h2 className="text-lg font-bold font-display">Achievement Gallery</h2>
-                          <p className="text-[11px] text-[var(--text-secondary)]">{earnedCount} of {totalCount} unlocked</p>
+                          <h3 className="text-sm font-bold font-display">Achievements</h3>
+                          <p className="text-[10px] text-[var(--text-secondary)]">{earnedCount} of {totalCount} earned</p>
                         </div>
                       </div>
-                      
-                      {/* Filter pills */}
-                      <div className="flex gap-1.5 p-1 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-                        {[
-                          { key: 'all' as const, label: 'All' },
-                          { key: 'earned' as const, label: `Earned (${earnedCount})` },
-                          { key: 'locked' as const, label: 'Locked' },
-                        ].map(f => (
-                          <button
-                            key={f.key}
-                            onClick={() => setAchievementFilter(f.key)}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
-                              achievementFilter === f.key
-                                ? 'bg-[var(--accent)] text-white shadow-sm'
-                                : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/[0.04]'
-                            }`}
-                          >
-                            {f.label}
-                          </button>
-                        ))}
+                      {/* Progress chip */}
+                      <div className="px-2 py-1 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/15">
+                        <span className="text-[10px] font-bold text-[var(--accent)]">
+                          {Math.round((earnedCount / totalCount) * 100)}%
+                        </span>
                       </div>
                     </div>
                     
                     {/* Overall progress bar */}
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                        <motion.div
-                          className="h-full rounded-full bg-gradient-to-r from-purple-400 via-[var(--accent)] to-[var(--accent-secondary)]"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(earnedCount / totalCount) * 100}%` }}
-                          transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-amber-400 via-[var(--accent)] to-purple-500"
+                          style={{ width: `${(earnedCount / totalCount) * 100}%`, transition: 'width 1s ease-out' }}
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Achievement Grid */}
-                  <div className="p-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {filteredAchievements.map((achievement, index) => {
-                        const isEarned = userAchievements.includes(achievement.id);
-                        const isShowcased = showcasedAchievements.includes(achievement.id);
-                        return (
-                          <motion.div
-                            key={achievement.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.3, delay: index * 0.03 }}
-                            className={`relative flex items-center gap-3 p-4 rounded-xl border transition-all group ${
-                              isEarned
-                                ? 'bg-gradient-to-r from-white/[0.04] to-transparent border-white/[0.08] hover:border-[var(--accent)]/30'
-                                : 'bg-white/[0.01] border-white/[0.04] opacity-60 hover:opacity-80'
-                            }`}
-                          >
-                            {/* Achievement icon */}
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 ${
-                              isEarned 
-                                ? 'bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent-secondary)]/10 shadow-inner' 
-                                : 'bg-white/[0.03] grayscale'
-                            }`}>
-                              {isEarned ? achievement.icon : <Lock size={18} className="text-[var(--text-secondary)]" />}
+                  <div className="p-4 space-y-2.5">
+                    {earnedAchievementsList.length > 0 ? (
+                      earnedAchievementsList.map((achievement) => (
+                        <div 
+                          key={achievement.id}
+                          className="group flex items-center gap-3 p-3.5 rounded-xl bg-gradient-to-r from-white/[0.04] via-white/[0.02] to-transparent border border-white/[0.08] hover:border-[var(--accent)]/25 transition-all hover:-translate-y-0.5 duration-200"
+                        >
+                          {/* Icon with glow */}
+                          <div className="relative flex-shrink-0">
+                            <div className="absolute inset-0 rounded-xl bg-[var(--accent)]/10 blur-sm group-hover:bg-[var(--accent)]/20 transition-colors" />
+                            <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent-secondary)]/10 flex items-center justify-center text-2xl shadow-inner border border-white/[0.06]">
+                              {achievement.icon}
                             </div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <p className={`font-semibold text-sm truncate ${isEarned ? 'text-white' : 'text-[var(--text-secondary)]'}`}>
-                                  {achievement.name}
-                                </p>
-                                {isShowcased && isEarned && (
-                                  <Star size={11} className="text-amber-400 shrink-0" fill="currentColor" />
-                                )}
-                              </div>
-                              <p className="text-[11px] text-[var(--text-secondary)] truncate mt-0.5">{achievement.description}</p>
-                            </div>
-                            
-                            {isEarned && (
-                              <div className="w-6 h-6 rounded-full bg-emerald-400/15 flex items-center justify-center shrink-0">
-                                <Check size={13} className="text-emerald-400" />
-                              </div>
-                            )}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                    
-                    {filteredAchievements.length === 0 && (
-                      <div className="text-center py-10">
-                        <Trophy className="mx-auto text-[var(--text-secondary)] opacity-20 mb-3" size={32} />
-                        <p className="text-sm text-[var(--text-secondary)]">No achievements match this filter</p>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm truncate">{achievement.name}</p>
+                            <p className="text-[10px] text-[var(--text-secondary)] truncate mt-0.5">{achievement.description}</p>
+                          </div>
+                          <div className="w-6 h-6 rounded-full bg-emerald-400/15 flex items-center justify-center shrink-0">
+                            <Check size={13} className="text-emerald-400" />
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mx-auto mb-3">
+                          <Trophy className="text-[var(--text-secondary)] opacity-40" size={24} />
+                        </div>
+                        <p className="text-sm font-semibold text-[var(--text-secondary)] mb-1">No achievements yet</p>
+                        <p className="text-[11px] text-[var(--text-secondary)]/60">Start solving problems to earn badges!</p>
                       </div>
                     )}
+                    
+                    {/* View all link */}
+                    <div className="pt-2 border-t border-white/[0.04]">
+                      <a 
+                        href="/stats" 
+                        className="flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-colors group"
+                      >
+                        <span>View All Achievements</span>
+                        <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                      </a>
+                    </div>
                   </div>
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
@@ -741,7 +718,6 @@ const ProfilePage = () => {
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
             <div className="relative overflow-hidden rounded-2xl border border-[var(--accent)]/30 shadow-2xl shadow-[var(--accent)]/30 min-w-[340px]">
-              {/* Animated gradient border */}
               <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent)]/10 via-[var(--accent-secondary)]/5 to-[var(--accent)]/10" />
               <div className="relative bg-[var(--primary)]/95 backdrop-blur-xl p-5 flex items-center gap-4">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent-secondary)]/10 border border-[var(--accent)]/20 flex items-center justify-center text-3xl shrink-0">

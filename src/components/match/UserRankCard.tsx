@@ -3,17 +3,25 @@ import { useAuth } from '../../context/AuthContext';
 import { getUserProfile } from '../../services/firebase/userProfile';
 
 interface UserRankCardProps {
-  userId?: string; // Use current user if not provided
+  userId?: string;
+  /** Pass stats directly to avoid duplicate Firebase call */
+  stats?: any;
 }
 
-const UserRankCard: React.FC<UserRankCardProps> = ({ userId }) => {
+const UserRankCard: React.FC<UserRankCardProps> = ({ userId, stats: propStats }) => {
   const { currentUser } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [userStats, setUserStats] = useState<any>(null);
+  const [loading, setLoading] = useState(!propStats);
+  const [userStats, setUserStats] = useState<any>(propStats || null);
   const id = userId || currentUser?.uid;
 
-  // Load user stats once on mount
+  // Only fetch if stats not provided via props
   useEffect(() => {
+    if (propStats) {
+      setUserStats(propStats);
+      setLoading(false);
+      return;
+    }
+
     const fetchUserStats = async () => {
       if (!id) {
         setLoading(false);
@@ -29,7 +37,6 @@ const UserRankCard: React.FC<UserRankCardProps> = ({ userId }) => {
         }
         
         if (data) {
-          console.log("Retrieved user stats:", data.stats);
           setUserStats(data.stats);
         }
       } catch (error) {
@@ -40,9 +47,7 @@ const UserRankCard: React.FC<UserRankCardProps> = ({ userId }) => {
     };
     
     fetchUserStats();
-    
-    // No auto-refresh interval
-  }, [id]);
+  }, [id, propStats]);
 
   // Get rank icon and color - ensure these thresholds match the backend
   const getRankInfo = (rankName: string) => {

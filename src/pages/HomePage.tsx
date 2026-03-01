@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useRef, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Code, Star, Users, Award, Swords, BookOpen, ChevronDown,
@@ -13,12 +13,17 @@ import '../styles/study.css';
 
 const HomePage = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const scrollToFeatures = () => {
     featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const features = [
+  const handleGetStarted = () => {
+    navigate('/profile');
+  };
+
+  const features = useMemo(() => [
     {
       icon: <Code size={24} />,
       title: 'Daily Coding Challenges',
@@ -61,14 +66,14 @@ const HomePage = () => {
       color: 'var(--accent-secondary)',
       link: '/leaderboard',
     },
-  ];
+  ], []);
 
-  const stats = [
+  const stats = useMemo(() => [
     { value: '50+', label: 'Problems', icon: <Code size={16} /> },
     { value: '1v1', label: 'Ranked', icon: <Swords size={16} /> },
     { value: '8', label: 'Topics', icon: <BookOpen size={16} /> },
     { value: '16', label: 'Badges', icon: <Award size={16} /> },
-  ];
+  ], []);
 
   return (
     <PageTransition>
@@ -113,7 +118,7 @@ const HomePage = () => {
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.7, ease: 'easeOut' }}
               >
-                <Link to="/profile" className="btn-primary">Get Started</Link>
+                <button onClick={handleGetStarted} className="btn-primary">Get Started</button>
               </motion.div>
             </nav>
 
@@ -148,10 +153,10 @@ const HomePage = () => {
 
                 <div className="flex flex-col sm:flex-row gap-4 mb-12">
                   <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-                    <Link to="/profile" className="btn-hero text-center block flex items-center justify-center gap-2">
+                    <button onClick={handleGetStarted} className="btn-hero text-center block flex items-center justify-center gap-2 w-full">
                       Start Your Journey
                       <ArrowRight size={18} />
-                    </Link>
+                    </button>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
                     <button
@@ -364,10 +369,10 @@ const HomePage = () => {
                     </div>
                   </div>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Link to="/profile" className="btn-primary flex items-center gap-2 whitespace-nowrap">
+                    <button onClick={handleGetStarted} className="btn-primary flex items-center gap-2 whitespace-nowrap">
                       <Sparkles size={16} />
                       Get Started Now
-                    </Link>
+                    </button>
                   </motion.div>
                 </div>
               </div>
