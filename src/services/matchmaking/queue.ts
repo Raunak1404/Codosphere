@@ -15,7 +15,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { codingProblems } from '../../data/codingProblems';
+import { getPublicProblems } from '../firebase';
 import { COLLECTIONS, ROOM_STATUS, MATCH_STATUS } from '../../config/constants';
 import { Match } from './match.types';
 
@@ -36,9 +36,19 @@ export const log = {
   warn: (message: string, data?: any) => console.warn(`[Matchmaking Warning] ${message}`, data || ''),
 };
 
-const getRandomProblem = (): number => {
-  const randomIndex = Math.floor(Math.random() * codingProblems.length);
-  return codingProblems[randomIndex].id;
+const getRandomProblem = async (): Promise<number> => {
+  try {
+    const problems = await getPublicProblems();
+    if (problems.length === 0) {
+      log.warn('No problems found in Firestore, using fallback ID');
+      return 1;
+    }
+    const randomIndex = Math.floor(Math.random() * problems.length);
+    return problems[randomIndex].numericId || (1000 + randomIndex);
+  } catch (error) {
+    log.error('Error fetching problems for random selection', error);
+    return 1;
+  }
 };
 
 export const cleanupExpiredRooms = async (): Promise<void> => {
@@ -137,7 +147,7 @@ export const atomicJoinOrCreateRoom = async (
 
       if (roomData.players.length === 1 && !roomData.players.includes(userId)) {
         const opponentId = roomData.players[0];
-        const problemId = getRandomProblem();
+        const problemId = await getRandomProblem();
 
         const matchesRef = collection(db, COLLECTIONS.MATCHES);
         const newMatchRef = doc(matchesRef);

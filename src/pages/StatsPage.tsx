@@ -12,7 +12,7 @@ import RevealOnScroll from '../components/common/RevealOnScroll';
 import AnimatedProgressBar from '../components/common/AnimatedProgressBar';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile } from '../services/firebase';
-import { codingProblems } from '../data/codingProblems';
+import { useProblems } from '../hooks/useProblems';
 import '../styles/study.css';
 
 // Define achievements with criteria - same as in ProfilePage
@@ -37,6 +37,7 @@ const achievementsList = [
 
 const StatsPage = () => {
   const { currentUser } = useAuth();
+  const { problems: allProblems, loading: problemsLoading } = useProblems();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
@@ -186,26 +187,26 @@ const StatsPage = () => {
   };
 
   const getDifficultyStats = () => {
-    const solvedProblemDetails = codingProblems.filter(p => stats.solvedProblems.includes(p.id));
+    const solvedProblemDetails = allProblems.filter(p => stats.solvedProblems.includes(p.id));
     return {
       Easy: {
         solved: solvedProblemDetails.filter(p => p.difficulty === 'Easy').length,
-        total: codingProblems.filter(p => p.difficulty === 'Easy').length
+        total: allProblems.filter(p => p.difficulty === 'Easy').length
       },
       Medium: {
         solved: solvedProblemDetails.filter(p => p.difficulty === 'Medium').length,
-        total: codingProblems.filter(p => p.difficulty === 'Medium').length
+        total: allProblems.filter(p => p.difficulty === 'Medium').length
       },
       Hard: {
         solved: solvedProblemDetails.filter(p => p.difficulty === 'Hard').length,
-        total: codingProblems.filter(p => p.difficulty === 'Hard').length
+        total: allProblems.filter(p => p.difficulty === 'Hard').length
       }
     };
   };
 
   const getCategoryStats = () => {
     const categories = new Map();
-    codingProblems.forEach(problem => {
+    allProblems.forEach(problem => {
       problem.tags.forEach(tag => {
         if (!categories.has(tag)) {
           categories.set(tag, { total: 0, solved: 0 });
@@ -257,7 +258,7 @@ const StatsPage = () => {
   const difficultyStats = getDifficultyStats();
   const categoryStats = getCategoryStats();
   const totalSolved = stats.solvedProblems.length;
-  const totalProblems = codingProblems.length;
+  const totalProblems = allProblems.length;
   const progressPercent = totalProblems > 0 ? Math.round((totalSolved / totalProblems) * 100) : 0;
 
   return (
@@ -479,7 +480,7 @@ const StatsPage = () => {
                         </h3>
                         {stats.solvedProblems.length > 0 ? (
                           <div className="space-y-2">
-                            {codingProblems
+                            {allProblems
                               .filter(p => stats.solvedProblems.includes(p.id))
                               .slice(0, 5)
                               .map((problem, index) => (

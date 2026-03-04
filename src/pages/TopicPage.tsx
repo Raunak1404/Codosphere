@@ -9,7 +9,7 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
 import { getTopicById, StudyTopic } from '../data/studyTopics';
-import { getProblemById } from '../data/codingProblems';
+import { useProblems } from '../hooks/useProblems';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-python';
@@ -67,6 +67,7 @@ const SidebarProgress: React.FC<{ percent: number }> = ({ percent }) => {
 
 const TopicPage: React.FC = () => {
   const { topic } = useParams<{ topic: string }>();
+  const { getProblemById } = useProblems();
   const [studyTopic, setStudyTopic] = useState<StudyTopic | null>(null);
   const [activeSection, setActiveSection] = useState(0);
   const [completedSections, setCompletedSections] = useState<number[]>([]);

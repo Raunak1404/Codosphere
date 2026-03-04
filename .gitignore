@@ -16,6 +16,9 @@ dist/
 # Logs
 *.log
 
+# Service account keys (NEVER commit)
+serviceAccount*.json
+
 # IDE / tool settings
 .claude/
 

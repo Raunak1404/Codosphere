@@ -5,19 +5,20 @@ import { Calendar, ChevronRight, Clock, Award, Package, Sparkles, Gift, Star, Za
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
-import { getProblemById, codingProblems } from '../data/codingProblems';
 import { useAuth } from '../context/AuthContext';
+import { useProblems } from '../hooks/useProblems';
 import { getUserProfile, getProblemSolvers } from '../services/firebase';
 import '../styles/study.css';
 
-// Get a daily problem based on the current date
-const getDailyProblem = () => {
+// Get a daily problem based on the current date and the loaded problems list
+const getDailyProblem = (problems: any[]) => {
+  if (!problems || problems.length === 0) return null;
   const today = new Date();
   const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
   
   // Use the seed to consistently select the same problem for the whole day
-  const randomIndex = seed % codingProblems.length;
-  return codingProblems[randomIndex] || codingProblems[0];
+  const randomIndex = seed % problems.length;
+  return problems[randomIndex] || problems[0];
 };
 
 // Simplified confetti animation component
@@ -52,7 +53,8 @@ const Confetti = ({ isVisible }: { isVisible: boolean }) => {
 
 const QuestionOfTheDayPage = () => {
   const { currentUser } = useAuth();
-  const [questionOfTheDay, setQuestionOfTheDay] = useState(getDailyProblem());
+  const { problems, loading: problemsLoading } = useProblems();
+  const [questionOfTheDay, setQuestionOfTheDay] = useState<any>(null);
   const [isBoxOpened, setIsBoxOpened] = useState(false);
   const [isBoxShaking, setIsBoxShaking] = useState(false);
   const [unboxProgress, setUnboxProgress] = useState(0);
@@ -68,6 +70,13 @@ const QuestionOfTheDayPage = () => {
   const [checkingSolved, setCheckingSolved] = useState(true);
   const boxRef = useRef<HTMLDivElement>(null);
 
+  // Set daily problem once problems load from Firestore
+  useEffect(() => {
+    if (!problemsLoading && problems.length > 0 && !questionOfTheDay) {
+      setQuestionOfTheDay(getDailyProblem(problems));
+    }
+  }, [problems, problemsLoading, questionOfTheDay]);
+
   // Live solvers data
   const [solvers, setSolvers] = useState<any[]>([]);
   const [loadingSolvers, setLoadingSolvers] = useState(true);
@@ -75,7 +84,7 @@ const QuestionOfTheDayPage = () => {
   // Check if user already solved today's daily problem
   useEffect(() => {
     const checkIfSolved = async () => {
-      if (!currentUser) {
+      if (!currentUser || !questionOfTheDay) {
         setCheckingSolved(false);
         return;
       }
@@ -91,10 +100,11 @@ const QuestionOfTheDayPage = () => {
       }
     };
     checkIfSolved();
-  }, [currentUser, questionOfTheDay.id]);
+  }, [currentUser, questionOfTheDay?.id]);
 
   // Fetch live solvers for the daily problem
   useEffect(() => {
+    if (!questionOfTheDay) return;
     const fetchSolvers = async () => {
       setLoadingSolvers(true);
       try {
@@ -107,7 +117,7 @@ const QuestionOfTheDayPage = () => {
       }
     };
     fetchSolvers();
-  }, [questionOfTheDay.id]);
+  }, [questionOfTheDay?.id]);
 
   // Get difficulty color
   const getDifficultyColor = (difficulty: string) => {
@@ -207,21 +217,30 @@ const QuestionOfTheDayPage = () => {
     }, 1000);
   };
 
-  if (!questionOfTheDay) {
+  if (problemsLoading || !questionOfTheDay) {
     return (
       <PageTransition>
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow flex items-center justify-center">
             <div className="text-center">
-              <p className="text-xl">No question available for today</p>
-              <Link
-                to="/code"
-                className="mt-4 flex items-center text-[var(--accent)] hover:underline justify-center"
-              >
-                <span>Browse all problems</span>
-                <ChevronRight size={16} className="ml-1" />
-              </Link>
+              {problemsLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 w-64 bg-[var(--bg-tertiary)] rounded mb-4 mx-auto" />
+                  <div className="h-4 w-48 bg-[var(--bg-tertiary)] rounded mx-auto" />
+                </div>
+              ) : (
+                <>
+                  <p className="text-xl">No question available for today</p>
+                  <Link
+                    to="/code"
+                    className="mt-4 flex items-center text-[var(--accent)] hover:underline justify-center"
+                  >
+                    <span>Browse all problems</span>
+                    <ChevronRight size={16} className="ml-1" />
+                  </Link>
+                </>
+              )}
             </div>
           </main>
           <Footer />

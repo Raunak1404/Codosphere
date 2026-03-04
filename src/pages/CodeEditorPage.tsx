@@ -6,7 +6,21 @@ import PageTransition from '../components/common/PageTransition';
 import ProblemPanel from '../components/problem/ProblemPanel';
 import CodeEditorPanel from '../components/editor/CodeEditorPanel';
 import MatchResultsOverlay from '../components/match/MatchResultsOverlay';
-import { getInitialCodeSnippet } from '../data/codingProblems';
+// Get starter code from the problem's embedded starterCode field
+const getInitialCodeSnippet = (language: string, _problemId: number, problem?: any): string => {
+  if (problem?.starterCode?.[language]) {
+    return problem.starterCode[language];
+  }
+  // Fallback: generic template
+  const defaults: Record<string, string> = {
+    javascript: '// Write your solution here\nfunction solution() {\n  \n}',
+    python: '# Write your solution here\ndef solution():\n    pass',
+    java: '// Write your solution here\nclass Solution {\n    public void solve() {\n        \n    }\n}',
+    c: '// Write your solution here\n#include <stdio.h>\n\nint main() {\n    return 0;\n}',
+    cpp: '// Write your solution here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}',
+  };
+  return defaults[language] || defaults.javascript;
+};
 import { useProblems } from '../hooks/useProblems';
 import { evaluateCode } from '../services/api/judge0';
 import { SubmissionResult as SubmissionResultType, TestCase, statusCodes } from '../services/api/judge0.types';
