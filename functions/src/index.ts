@@ -9,6 +9,9 @@ export { setAdminClaim, revokeAdminClaim } from './admin/setClaims';
 // Admin — problem CRUD
 export { adminCreateProblem, adminUpdateProblem, adminDeleteProblem } from './admin/problems';
 
+// Admin — study topic CRUD
+export { adminCreateStudyTopic, adminUpdateStudyTopic, adminDeleteStudyTopic } from './admin/studyTopics';
+
 // Admin — player management
 export { adminBanPlayer, adminDeletePlayer } from './admin/playerManagement';
 

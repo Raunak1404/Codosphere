@@ -26,6 +26,7 @@ export const COLLECTIONS = {
   PROBLEMS: 'problems',
   MATCHES: 'matches',
   MATCH_ROOMS: 'matchRooms',
+  STUDY_TOPICS: 'studyTopics',
 } as const;
 
 // Matchmaking room status

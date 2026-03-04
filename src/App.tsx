@@ -20,6 +20,7 @@ const StatsPage = lazy(() => import('./pages/StatsPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminPlayerManagement = lazy(() => import('./pages/AdminPlayerManagement'));
+const AdminStudyTopics = lazy(() => import('./pages/AdminStudyTopics'));
 
 // Components
 import AdminRoute from './components/admin/AdminRoute';
@@ -125,6 +126,11 @@ function App() {
           <Route path="/admin/players" element={
             <AdminRoute>
               <AdminPlayerManagement />
+            </AdminRoute>
+          } />
+          <Route path="/admin/study" element={
+            <AdminRoute>
+              <AdminStudyTopics />
             </AdminRoute>
           } />
         </Routes>

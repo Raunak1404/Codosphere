@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,7 +9,7 @@ import {
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
-import { studyTopics } from '../data/studyTopics';
+import { getPublicStudyTopics, AdminStudyTopic } from '../services/firebase/studyTopics';
 import '../styles/study.css';
 
 // Icon mapping
@@ -104,19 +104,28 @@ const StudyPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [topics, setTopics] = useState<AdminStudyTopic[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getPublicStudyTopics().then(data => {
+      setTopics(data);
+      setLoading(false);
+    });
+  }, []);
 
   const filteredTopics = useMemo(() => {
-    return studyTopics.filter(topic => {
+    return topics.filter(topic => {
       const matchesFilter = activeFilter === 'all' || topic.difficulty === activeFilter;
       const matchesSearch = topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         topic.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     });
-  }, [activeFilter, searchQuery]);
+  }, [topics, activeFilter, searchQuery]);
 
   // Aggregate stats
-  const totalProblems = studyTopics.reduce((sum, t) => sum + t.problems, 0);
-  const totalTopics = studyTopics.length;
+  const totalProblems = topics.reduce((sum, t) => sum + t.problems, 0);
+  const totalTopics = topics.length;
 
   const filters: { label: string; value: FilterType; icon: React.ReactNode }[] = [
     { label: 'All Topics', value: 'all', icon: <Layers size={14} /> },
@@ -253,6 +262,9 @@ const StudyPage: React.FC = () => {
           {/* ===== TOPIC CARDS GRID ===== */}
           <section className="py-8">
             <div className="container-custom">
+              {loading ? (
+                <div className="flex justify-center py-20 text-[var(--text-secondary)]">Loading topics…</div>
+              ) : (
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeFilter + searchQuery}
@@ -264,12 +276,12 @@ const StudyPage: React.FC = () => {
                 >
                   {filteredTopics.map((topic, index) => {
                     const dc = difficultyConfig[topic.difficulty] || difficultyConfig.Beginner;
-                    const isHovered = hoveredCard === topic.id;
+                    const isHovered = hoveredCard === topic.topicId;
                     const simulatedProgress = 0;
 
                     return (
                       <motion.div
-                        key={topic.id}
+                        key={topic.topicId}
                         initial={{ opacity: 0, y: 20, scale: 0.97 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{
@@ -277,10 +289,10 @@ const StudyPage: React.FC = () => {
                           delay: index * 0.06,
                           ease: [0.25, 0.1, 0.25, 1],
                         }}
-                        onMouseEnter={() => setHoveredCard(topic.id)}
+                        onMouseEnter={() => setHoveredCard(topic.topicId)}
                         onMouseLeave={() => setHoveredCard(null)}
                       >
-                        <Link to={`/study/${topic.id}`} className="block h-full">
+                        <Link to={`/study/${topic.topicId}`} className="block h-full">
                           <div className="topic-card h-full p-5 flex flex-col">
                             {/* Card top: Icon + mini progress */}
                             <div className="flex items-start justify-between mb-4">
@@ -353,9 +365,10 @@ const StudyPage: React.FC = () => {
                   })}
                 </motion.div>
               </AnimatePresence>
+              )}
 
               {/* Empty state */}
-              {filteredTopics.length === 0 && (
+              {!loading && filteredTopics.length === 0 && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}

@@ -21,4 +21,12 @@ export {
   deletePlayer,
 } from './playerManagement';
 export type { PlayerData } from './playerManagement';
+export type { AdminStudyTopic, TopicSection, PracticeProblem } from './studyTopics';
+export {
+  createStudyTopic,
+  updateStudyTopic,
+  deleteStudyTopic,
+  getAllStudyTopics,
+  getPublicStudyTopics,
+} from './studyTopics';
 export { auth, db, storage, app } from '../../config/firebase';

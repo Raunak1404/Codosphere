@@ -8,7 +8,7 @@ import {
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
-import { getTopicById, StudyTopic } from '../data/studyTopics';
+import { getStudyTopicBySlug, AdminStudyTopic } from '../services/firebase/studyTopics';
 import { useProblems } from '../hooks/useProblems';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-javascript';
@@ -68,7 +68,7 @@ const SidebarProgress: React.FC<{ percent: number }> = ({ percent }) => {
 const TopicPage: React.FC = () => {
   const { topic } = useParams<{ topic: string }>();
   const { getProblemById } = useProblems();
-  const [studyTopic, setStudyTopic] = useState<StudyTopic | null>(null);
+  const [studyTopic, setStudyTopic] = useState<AdminStudyTopic | null>(null);
   const [activeSection, setActiveSection] = useState(0);
   const [completedSections, setCompletedSections] = useState<number[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -76,12 +76,13 @@ const TopicPage: React.FC = () => {
 
   useEffect(() => {
     if (topic) {
-      const topicData = getTopicById(topic);
-      if (topicData) {
-        setStudyTopic(topicData);
-        setActiveSection(0);
-        setCompletedSections([]);
-      }
+      getStudyTopicBySlug(topic).then(topicData => {
+        if (topicData) {
+          setStudyTopic(topicData);
+          setActiveSection(0);
+          setCompletedSections([]);
+        }
+      });
     }
   }, [topic]);
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Users, LogOut, Menu, X, Shield } from 'lucide-react';
+import { FileText, Users, LogOut, Menu, X, Shield, BookOpen } from 'lucide-react';
 import LogoIcon from '../common/LogoIcon';
 import GlowText from '../common/GlowText';
 import { useAuth } from '../../context/AuthContext';
@@ -9,6 +9,7 @@ import { logout } from '../../services/firebase/auth';
 
 const adminNavLinks = [
   { name: 'Problems', path: '/admin', icon: <FileText size={20} /> },
+  { name: 'Study Topics', path: '/admin/study', icon: <BookOpen size={20} /> },
   { name: 'Players', path: '/admin/players', icon: <Users size={20} /> },
 ];
 

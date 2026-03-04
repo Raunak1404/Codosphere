@@ -114,6 +114,18 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------
+    // Study Topics (admin-managed study material)
+    // -------------------------------------------------------
+    match /studyTopics/{topicId} {
+      // Any active user can read study topics
+      allow read: if isActiveUser();
+
+      // Only admins can write study topics — enforced by Cloud Functions,
+      // this rule provides the database-level safety net
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------
     // Matchmaking lock (atomic room join/create)
     // -------------------------------------------------------
     match /matchmaking/{docId} {
