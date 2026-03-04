@@ -1,5 +1,5 @@
-import React from 'react';
-import { Eye, Edit, Trash2, FileText, Search, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, Edit, Trash2, FileText, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface AdminProblem {
   id?: string;
@@ -46,6 +46,9 @@ const ProblemTable: React.FC<ProblemTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const problemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
   const filteredProblems = problems.filter((problem) => {
     const matchesSearch =
       problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,6 +56,30 @@ const ProblemTable: React.FC<ProblemTableProps> = ({
     const matchesDifficulty = !difficultyFilter || problem.difficulty === difficultyFilter;
     return matchesSearch && matchesDifficulty;
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProblems.length / problemsPerPage);
+  const indexOfLastProblem = currentPage * problemsPerPage;
+  const indexOfFirstProblem = indexOfLastProblem - problemsPerPage;
+  const currentProblems = filteredProblems.slice(indexOfFirstProblem, indexOfLastProblem);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, difficultyFilter]);
+
+  // Clamp page if it exceeds total after data changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [filteredProblems.length, currentPage, totalPages]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <>
@@ -107,7 +134,7 @@ const ProblemTable: React.FC<ProblemTableProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {filteredProblems.map((problem) => (
+                {currentProblems.map((problem) => (
                   <tr key={problem.id} className="border-b border-gray-800 hover:bg-[var(--primary)] hover:bg-opacity-50">
                     <td className="py-3 px-4">
                       <div className="font-medium">{problem.title}</div>
@@ -187,6 +214,70 @@ const ProblemTable: React.FC<ProblemTableProps> = ({
             {filteredProblems.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-[var(--text-secondary)]">No problems found</p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-gray-700 px-4 py-3 mt-2">
+                <div className="text-xs text-[var(--text-secondary)]">
+                  Showing <span className="font-medium text-[var(--text)]">{indexOfFirstProblem + 1}</span> to{' '}
+                  <span className="font-medium text-[var(--text)]">
+                    {Math.min(indexOfLastProblem, filteredProblems.length)}
+                  </span>{' '}
+                  of <span className="font-medium text-[var(--text)]">{filteredProblems.length}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      currentPage === 1
+                        ? 'text-white/20 cursor-not-allowed'
+                        : 'text-[var(--text-secondary)] hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-medium transition-colors ${
+                          currentPage === pageNum
+                            ? 'bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20'
+                            : 'text-[var(--text-secondary)] hover:bg-white/[0.06]'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      currentPage === totalPages
+                        ? 'text-white/20 cursor-not-allowed'
+                        : 'text-[var(--text-secondary)] hover:bg-white/[0.06]'
+                    }`}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
               </div>
             )}
           </div>
