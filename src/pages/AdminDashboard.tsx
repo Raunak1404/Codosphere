@@ -13,7 +13,6 @@ import {
   updateProblem,
   deleteProblem,
   getAllProblems,
-  isAdmin,
 } from '../services/firebase';
 
 const INITIAL_FORM: Partial<AdminProblem> = {
@@ -27,7 +26,7 @@ const INITIAL_FORM: Partial<AdminProblem> = {
 };
 
 const AdminDashboard = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const [problems, setProblems] = useState<AdminProblem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -41,10 +40,10 @@ const AdminDashboard = () => {
 
   // Admin check
   useEffect(() => {
-    if (currentUser && !isAdmin(currentUser)) {
+    if (currentUser && !isAdmin) {
       window.location.href = '/';
     }
-  }, [currentUser]);
+  }, [currentUser, isAdmin]);
 
   // Load problems on mount
   useEffect(() => {
@@ -132,7 +131,7 @@ const AdminDashboard = () => {
     setShowCreateModal(true);
   };
 
-  if (!currentUser || !isAdmin(currentUser)) return null;
+  if (!currentUser || !isAdmin) return null;
 
   return (
     <PageTransition>

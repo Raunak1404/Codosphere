@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // -------------------------------------------------------
+    // Profile images
+    // -------------------------------------------------------
+    // Users can read any profile image (needed for displaying avatars in UI)
+    // Users can upload only their OWN image — filename must start with their UID
+    match /profileImages/{fileName} {
+      allow read: if request.auth != null
+        && request.auth.token.get('banned', false) != true;
+
+      allow write: if request.auth != null
+        && request.auth.token.get('banned', false) != true
+        && fileName.matches(request.auth.uid + '_.*')
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // -------------------------------------------------------
+    // Problem content files
+    // -------------------------------------------------------
+    // Any active user can read problem files
+    // Only admins can write problem files
+    match /problem-files/{fileName} {
+      allow read: if request.auth != null
+        && request.auth.token.get('banned', false) != true;
+
+      allow write: if request.auth != null
+        && request.auth.token.get('admin', false) == true
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType in [
+          'text/plain',
+          'text/markdown',
+          'application/pdf',
+          'text/html'
+        ];
+    }
+
+    // -------------------------------------------------------
+    // Deny everything else
+    // -------------------------------------------------------
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

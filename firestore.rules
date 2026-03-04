@@ -4,54 +4,100 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // -------------------------------------------------------
+    // Helper functions
+    // -------------------------------------------------------
+
+    // Is the caller authenticated?
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Does the caller have the admin custom claim?
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.get('admin', false) == true;
+    }
+
+    // Is the caller the owner of this document?
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Is the caller NOT banned? (uses custom claim — no extra Firestore read)
+    function isNotBanned() {
+      return request.auth.token.get('banned', false) != true;
+    }
+
+    // Is the caller authenticated, not banned, and active?
+    function isActiveUser() {
+      return isSignedIn() && isNotBanned();
+    }
+
+    // -------------------------------------------------------
     // Users collection
     // -------------------------------------------------------
     match /users/{userId} {
-      // Anyone signed-in can read any user profile (needed for leaderboard, opponent profiles)
-      allow read: if request.auth != null;
+      // Any signed-in, non-banned user can read profiles (leaderboard, opponent view)
+      allow read: if isActiveUser();
 
-      // Users can create their own profile doc
-      allow create: if request.auth != null && request.auth.uid == userId;
+      // Users can create their own profile document
+      allow create: if isOwner(userId) && isNotBanned();
 
-      // Users can update their own profile doc
-      allow update: if request.auth != null && request.auth.uid == userId;
+      // Users can update ONLY their own display/preference fields.
+      // Stats (problemsSolved, rank points, streak, etc.) are written exclusively
+      // by Cloud Functions — locking them here prevents client-side cheating.
+      allow update: if isOwner(userId) && isNotBanned()
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly([
+              'name', 'coderName', 'profileImage', 'selectedAvatar',
+              'lastActive', 'email'
+            ]);
 
-      // Matches can also update both players' docs via transactions
-      // (winner/loser stats). Allow update if the requester is authenticated.
-      allow update: if request.auth != null;
+      // Admins can update anything (needed for ban metadata written server-side,
+      // but ban enforcement happens via Cloud Function + custom claims)
+      allow update: if isAdmin();
+
+      // No client-side deletes — use the adminDeletePlayer Cloud Function
+      allow delete: if false;
     }
 
     // -------------------------------------------------------
     // Match rooms (matchmaking queue)
     // -------------------------------------------------------
     match /matchRooms/{roomId} {
-      // Any authenticated user can read rooms (needed for querying available rooms)
-      allow read: if request.auth != null;
+      allow read: if isActiveUser();
 
-      // Any authenticated user can create a room (they add themselves to the queue)
-      allow create: if request.auth != null;
+      // Allow create if the caller is adding themselves to the room
+      allow create: if isActiveUser()
+        && request.auth.uid in request.resource.data.players;
 
-      // Any authenticated user can update a room (joining an existing room)
-      allow update: if request.auth != null;
+      // Allow update if the caller is a player in this room
+      allow update: if isActiveUser()
+        && (request.auth.uid in resource.data.players
+            || request.auth.uid in request.resource.data.players);
 
-      // Any authenticated user can delete a room (cleanup / cancel)
-      allow delete: if request.auth != null;
+      // Allow delete if the caller is a player in this room, or admin
+      allow delete: if (isActiveUser() && request.auth.uid in resource.data.players)
+        || isAdmin();
     }
 
     // -------------------------------------------------------
     // Matches (active and completed ranked matches)
     // -------------------------------------------------------
     match /matches/{matchId} {
-      // Any authenticated user can read matches
-      allow read: if request.auth != null;
+      // Any active user can read matches
+      allow read: if isActiveUser();
 
-      // Any authenticated user can create a match (created during matchmaking transaction)
-      allow create: if request.auth != null;
+      // Any active user can create a match (created during matchmaking transaction)
+      allow create: if isActiveUser()
+        && request.auth.uid in [request.resource.data.player1, request.resource.data.player2];
 
-      // Any authenticated user can update a match (submit solution, mark completed, award points)
-      allow update: if request.auth != null;
+      // Only players in the match can update it (submit solution, forfeit)
+      // Stats fields (pointsAwarded, winner) are also updated by the onMatchComplete trigger
+      // which uses the Admin SDK and bypasses client rules entirely.
+      allow update: if isActiveUser()
+        && request.auth.uid in [resource.data.player1, resource.data.player2];
 
-      // Matches should not be deleted by clients
+      // Matches are never deleted by clients
       allow delete: if false;
     }
 
@@ -59,18 +105,19 @@ service cloud.firestore {
     // Problems (admin-managed coding problems)
     // -------------------------------------------------------
     match /problems/{problemId} {
-      // Anyone signed-in can read problems
-      allow read: if request.auth != null;
+      // Any active user can read problems
+      allow read: if isActiveUser();
 
-      // Only allow writes if user is authenticated (admin check done server-side)
-      allow write: if request.auth != null;
+      // Only admins can write problems — enforced by Cloud Functions,
+      // this rule provides the database-level safety net
+      allow write: if isAdmin();
     }
 
     // -------------------------------------------------------
-    // Matchmaking lock (used for atomic room join/create)
+    // Matchmaking lock (atomic room join/create)
     // -------------------------------------------------------
     match /matchmaking/{docId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isActiveUser();
     }
   }
 }

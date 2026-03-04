@@ -1,14 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { isAdmin } from '../../services/firebase/admin';
 
 interface AdminRouteProps {
   children: React.ReactNode;
 }
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, loading, isAdmin } = useAuth();
 
   if (loading) {
     return (
@@ -18,7 +17,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     );
   }
 
-  if (!currentUser || !isAdmin(currentUser)) {
+  if (!currentUser || !isAdmin) {
     return <Navigate to="/" replace />;
   }
 

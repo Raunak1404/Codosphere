@@ -337,9 +337,8 @@ const CodeEditorPage = () => {
       if (winnerData) setWinnerProfile(winnerData);
       if (loserData) setLoserProfile(loserData);
 
-      // Points are handled atomically by autoUpdateWinnerStats (triggered
-      // by submitMatchSolution). No client-side point updates needed here
-      // — this prevents the race condition where both clients award points.
+      // Points are handled atomically by the onMatchComplete Cloud Function trigger.
+      // No client-side point updates needed here.
       setResultsUpdated(true);
     } catch (error: any) {
       console.error('Error in match completion handling:', error);

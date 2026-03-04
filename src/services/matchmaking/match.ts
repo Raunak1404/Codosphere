@@ -5,7 +5,6 @@ import {
   where,
   getDocs,
   doc,
-  updateDoc,
   getDoc,
   runTransaction,
   onSnapshot,
@@ -13,7 +12,6 @@ import {
 import { db } from '../../config/firebase';
 import { COLLECTIONS, MATCH_STATUS } from '../../config/constants';
 import { Match } from './match.types';
-import { updateMatchResults } from '../firebase/userStats';
 import { deleteRoomForMatch, log } from './queue';
 
 export interface SubmitMatchResult {
@@ -22,39 +20,6 @@ export interface SubmitMatchResult {
   winnerId?: string;
   loserId?: string;
 }
-
-export const autoUpdateWinnerStats = async (
-  winnerId: string,
-  loserId: string,
-  matchId: string
-): Promise<void> => {
-  try {
-    log.info(`Auto-updating stats for winner: ${winnerId}, loser: ${loserId}, match: ${matchId}`);
-
-    // Small delay to let Firestore match-document write settle
-    setTimeout(async () => {
-      try {
-        // updateMatchResults now uses a single atomic transaction that
-        // reads + checks pointsAwarded + writes stats all in one go,
-        // so there is no race window between clients.
-        const result = await updateMatchResults(winnerId, loserId, matchId);
-        if (result.success) {
-          if (result.alreadyProcessed) {
-            log.info(`Match ${matchId} stats already processed, skipping`);
-          } else {
-            log.info(`Successfully updated stats for match ${matchId}`);
-          }
-        } else {
-          log.error(`Failed to update stats for match ${matchId}:`, result.error);
-        }
-      } catch (error) {
-        log.error(`Error in auto-update stats for match ${matchId}:`, error);
-      }
-    }, 2000);
-  } catch (error) {
-    log.error('Error setting up auto-update stats', error);
-  }
-};
 
 export const getMatch = async (matchId: string): Promise<Match | null> => {
   try {
@@ -72,6 +37,7 @@ export const getMatch = async (matchId: string): Promise<Match | null> => {
 /**
  * Forfeit a match — marks the given user as the loser and the opponent
  * as the winner. Used when a player leaves or disconnects.
+ * Stats updates are handled automatically by the onMatchComplete Cloud Function trigger.
  */
 export const forfeitMatch = async (
   matchId: string,
@@ -109,10 +75,9 @@ export const forfeitMatch = async (
       return { success: true, winnerId, loserId: forfeitingUserId };
     });
 
-    // Post-transaction: update stats + clean up room
+    // Post-transaction: clean up room. Stats are handled by onMatchComplete trigger.
     if (result.winnerId && result.loserId) {
       setTimeout(() => deleteRoomForMatch(matchId), 100);
-      autoUpdateWinnerStats(result.winnerId, result.loserId, matchId);
     }
 
     return result;
@@ -222,10 +187,9 @@ export const submitMatchSolution = async (
       } as SubmitMatchResult;
     });
 
-    // Post-transaction side effects (only if match just completed)
-    if (result.matchCompleted && result.winnerId && result.loserId) {
+    // Post-transaction: clean up room. Stats are handled by onMatchComplete trigger.
+    if (result.matchCompleted) {
       setTimeout(() => deleteRoomForMatch(matchId), 100);
-      autoUpdateWinnerStats(result.winnerId, result.loserId, matchId);
     }
 
     return result;

@@ -27,9 +27,4 @@ export const env = {
     apiKey: requireEnv('VITE_JUDGE0_API_KEY'),
     apiHost: requireEnv('VITE_JUDGE0_API_HOST'),
   },
-  // Parse comma-separated admin UIDs from env
-  adminUids: ((import.meta.env.VITE_ADMIN_UIDS as string) || '')
-    .split(',')
-    .map((uid) => uid.trim())
-    .filter(Boolean),
 } as const;

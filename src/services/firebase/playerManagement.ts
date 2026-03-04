@@ -1,15 +1,11 @@
 import {
   collection,
   getDocs,
-  doc,
-  updateDoc,
-  deleteDoc,
   query,
   orderBy,
-  serverTimestamp,
 } from 'firebase/firestore';
-import { ref, deleteObject, listAll } from 'firebase/storage';
-import { db, storage } from '../../config/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { db, app } from '../../config/firebase';
 import { checkAdminAuth } from './admin';
 
 export interface PlayerData {
@@ -39,9 +35,11 @@ export interface PlayerData {
   achievements: any[];
 }
 
+const fns = getFunctions(app);
+
 /**
- * Fetch all user documents from the `users` collection.
- * Admin-only — checks auth before querying.
+ * Fetch all user documents — admin dashboard.
+ * Direct Firestore read (any active user can read profiles per rules).
  */
 export const getAllPlayers = async (): Promise<{
   players: PlayerData[];
@@ -90,109 +88,49 @@ export const getAllPlayers = async (): Promise<{
     return { players, error: null };
   } catch (error: any) {
     console.error('Error fetching all players:', error);
-    if (error.code === 'permission-denied') {
-      return {
-        players: [],
-        error:
-          'Firebase permission denied. Please configure Firestore security rules to allow admin read access to the users collection.',
-      };
-    }
     return { players: [], error: error.message };
   }
 };
 
 /**
- * Ban or unban a player. Sets/clears the `isBanned` flag on the user doc.
- * The app should check this flag during login / usage to enforce the ban.
+ * Ban or unban a player via Cloud Function.
+ * The function sets the Firestore flag AND the `banned` custom claim,
+ * then revokes refresh tokens for near-instant enforcement.
  */
 export const banPlayer = async (
   userId: string,
   ban: boolean,
   reason?: string
 ): Promise<{ success: boolean; error?: string }> => {
+  const authCheck = checkAdminAuth();
+  if (!authCheck.isAuthorized) return { success: false, error: authCheck.error };
+
   try {
-    const authCheck = checkAdminAuth();
-    if (!authCheck.isAuthorized) {
-      return { success: false, error: authCheck.error };
-    }
-
-    const userRef = doc(db, 'users', userId);
-
-    if (ban) {
-      await updateDoc(userRef, {
-        isBanned: true,
-        bannedAt: serverTimestamp(),
-        bannedReason: reason || 'Banned by admin',
-      });
-    } else {
-      await updateDoc(userRef, {
-        isBanned: false,
-        bannedAt: null,
-        bannedReason: '',
-      });
-    }
-
-    console.log(`Player ${userId} ${ban ? 'banned' : 'unbanned'} successfully`);
+    const callable = httpsCallable(fns, 'adminBanPlayer');
+    await callable({ userId, ban, reason });
     return { success: true };
   } catch (error: any) {
     console.error('Error banning/unbanning player:', error);
-    if (error.code === 'permission-denied') {
-      return {
-        success: false,
-        error:
-          'Firebase permission denied. Please configure Firestore security rules to allow admin write access to the users collection.',
-      };
-    }
     return { success: false, error: error.message };
   }
 };
 
 /**
- * Delete a player's account completely:
- * 1. Delete their profile image from Storage (if any)
- * 2. Delete the user document from Firestore
- *
- * Note: This does NOT delete the Firebase Auth user — that requires the
- * Firebase Admin SDK (server-side). The Firestore doc is the source of truth
- * for the app; the orphaned Auth record will simply have no profile data.
+ * Permanently delete a player via Cloud Function.
+ * Deletes Storage files, Firestore document, and Firebase Auth user.
  */
 export const deletePlayer = async (
   userId: string
 ): Promise<{ success: boolean; error?: string }> => {
+  const authCheck = checkAdminAuth();
+  if (!authCheck.isAuthorized) return { success: false, error: authCheck.error };
+
   try {
-    const authCheck = checkAdminAuth();
-    if (!authCheck.isAuthorized) {
-      return { success: false, error: authCheck.error };
-    }
-
-    // Best-effort: delete profile images from Storage
-    try {
-      const imagesRef = ref(storage, 'profileImages');
-      const imagesList = await listAll(imagesRef);
-      const userImages = imagesList.items.filter((item) =>
-        item.name.startsWith(`${userId}_`)
-      );
-      await Promise.all(userImages.map((item) => deleteObject(item)));
-    } catch {
-      // Storage might not have images — that's fine
-      console.warn('Could not clean up storage files for user', userId);
-    }
-
-    // Delete the Firestore user document
-    const userRef = doc(db, 'users', userId);
-    await deleteDoc(userRef);
-
-    console.log(`Player ${userId} deleted successfully`);
+    const callable = httpsCallable(fns, 'adminDeletePlayer');
+    await callable({ userId });
     return { success: true };
   } catch (error: any) {
     console.error('Error deleting player:', error);
-    if (error.code === 'permission-denied') {
-      return {
-        success: false,
-        error:
-          'Firebase permission denied. Please configure Firestore security rules to allow admin delete access to the users collection.',
-      };
-    }
     return { success: false, error: error.message };
   }
 };
