@@ -80,11 +80,14 @@ const HomePage = () => {
       <div className="flex flex-col min-h-screen">
         {/* ===== HERO SECTION ===== */}
         <header className="bg-[var(--primary)] relative min-h-screen flex items-center overflow-hidden">
-          {/* Background mesh */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-[15%] left-[20%] w-[600px] h-[600px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.06]" />
-            <div className="absolute bottom-[15%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent-secondary)] filter blur-[160px] opacity-[0.05]" />
-            <div className="absolute top-[60%] left-[50%] w-[400px] h-[400px] rounded-full bg-[var(--accent-tertiary)] filter blur-[140px] opacity-[0.03]" />
+          {/* Background mesh — translateZ(0) promotes each blob to its own GPU
+               compositor layer so Safari doesn't re-rasterize on every scroll.
+               Blur radii reduced (180→100, 160→80, 140→60px) for lower GPU load
+               while retaining the ambient-glow look. */}
+          <div className="absolute inset-0 overflow-hidden" style={{ transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)' }}>
+            <div className="absolute top-[15%] left-[20%] w-[600px] h-[600px] rounded-full bg-[var(--accent)] filter blur-[100px] opacity-[0.06]" style={{ transform: 'translateZ(0)' }} />
+            <div className="absolute bottom-[15%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent-secondary)] filter blur-[80px] opacity-[0.05]" style={{ transform: 'translateZ(0)' }} />
+            <div className="absolute top-[60%] left-[50%] w-[400px] h-[400px] rounded-full bg-[var(--accent-tertiary)] filter blur-[60px] opacity-[0.03]" style={{ transform: 'translateZ(0)' }} />
             {/* Hex grid pattern */}
             <div className="study-hex-grid opacity-[0.015]" />
           </div>

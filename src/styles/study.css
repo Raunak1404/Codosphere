@@ -17,7 +17,8 @@
   border-radius: 1rem;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  will-change: transform;
+  /* will-change removed from base rule — was GPU-promoting EVERY card permanently,
+     wasting VRAM on Safari. Now only applied on hover. */
 }
 
 .topic-card::before {
@@ -40,6 +41,7 @@
 }
 
 .topic-card:hover {
+  will-change: transform;
   transform: translateY(-4px);
   box-shadow:
     0 16px 48px rgba(0, 0, 0, 0.4),

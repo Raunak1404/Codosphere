@@ -42,7 +42,9 @@
     rgba(244, 91, 105, 0.6) 0%,
     rgba(244, 91, 105, 0.4) 50%,
     rgba(244, 91, 105, 0.6) 100%);
-  backdrop-filter: blur(20px);
+  /* Reduced blur: 20px → 12px. Still glassy but ~3× less GPU load on Safari. */
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(244, 91, 105, 0.2);
   box-shadow:
     0 8px 32px rgba(244, 91, 105, 0.2),
@@ -78,7 +80,8 @@
     rgba(244, 91, 105, 0.6) 0%,
     rgba(244, 91, 105, 0.4) 50%,
     rgba(244, 91, 105, 0.6) 100%);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(244, 91, 105, 0.2);
   box-shadow:
     0 12px 40px rgba(244, 91, 105, 0.25),
@@ -109,7 +112,8 @@
     rgba(45, 26, 26, 0.8) 0%,
     rgba(45, 26, 26, 0.6) 50%,
     rgba(45, 26, 26, 0.8) 100%);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text);
   box-shadow:
@@ -147,7 +151,8 @@
     rgba(45, 26, 26, 0.8) 0%,
     rgba(45, 26, 26, 0.6) 50%,
     rgba(45, 26, 26, 0.8) 100%);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text);
   box-shadow:
@@ -181,7 +186,8 @@
     rgba(0, 212, 255, 0.6) 0%,
     rgba(0, 212, 255, 0.4) 50%,
     rgba(0, 212, 255, 0.6) 100%);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   box-shadow:
     0 8px 32px rgba(0, 212, 255, 0.2),
@@ -217,7 +223,8 @@
     rgba(34, 197, 94, 0.6) 0%,
     rgba(34, 197, 94, 0.4) 50%,
     rgba(34, 197, 94, 0.6) 100%);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(34, 197, 94, 0.2);
   box-shadow:
     0 8px 32px rgba(34, 197, 94, 0.2),
@@ -253,7 +260,8 @@
     rgba(239, 68, 68, 0.6) 0%,
     rgba(239, 68, 68, 0.4) 50%,
     rgba(239, 68, 68, 0.6) 100%);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(239, 68, 68, 0.2);
   box-shadow:
     0 8px 32px rgba(239, 68, 68, 0.2),
@@ -294,7 +302,8 @@ button:not([class*="btn-"]) {
 
 button:not([class*="btn-"]):hover {
   @apply transform scale-105;
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(244, 91, 105, 0.15);
 }
 
@@ -306,7 +315,8 @@ button:not([class*="btn-"]):hover {
     rgba(255, 255, 255, 0.08) 0%,
     rgba(255, 255, 255, 0.04) 50%,
     rgba(255, 255, 255, 0.08) 100%);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
