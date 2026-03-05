@@ -92,7 +92,7 @@ const HomePage = () => {
             <div className="study-hex-grid opacity-[0.015]" />
           </div>
 
-          <div className="absolute inset-0 bg-gradient-to-b from-[#080510] via-transparent to-[var(--primary)] opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[var(--primary)] opacity-60" />
 
           <div className="container-custom z-10 py-24">
             {/* Nav */}

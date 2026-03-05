@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 type LogoIconProps = {
   size?: number;
@@ -12,6 +13,12 @@ const LogoIcon: React.FC<LogoIconProps> = ({
   className = "", 
   variant = 'default' 
 }) => {
+  const { theme } = useTheme();
+  const isForest = theme === 'forest';
+
+  const gradientColors = isForest
+    ? { start: '#10b981', end: '#2dd4bf' }
+    : { start: '#f45b69', end: '#00d4ff' };
   // Different animation variants for different contexts
   const getAnimationProps = () => {
     switch (variant) {
@@ -69,8 +76,8 @@ const LogoIcon: React.FC<LogoIconProps> = ({
     >
       <defs>
         <linearGradient id={`gradient-${size}-${variant}`} x1="10" y1="10" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#f45b69" />
-          <stop offset="1" stopColor="#00d4ff" />
+          <stop stopColor={gradientColors.start} />
+          <stop offset="1" stopColor={gradientColors.end} />
         </linearGradient>
         
         <filter id={`glow-${size}-${variant}`} x="-50%" y="-50%" width="200%" height="200%">
@@ -94,29 +101,52 @@ const LogoIcon: React.FC<LogoIconProps> = ({
         style={{ pointerEvents: 'visibleStroke' }}
       />
       
-      {/* First arrow */}
-      <path
-        d="M13 15L20 22L27 15"
-        stroke={`url(#gradient-${size}-${variant})`}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        filter={`url(#glow-${size}-${variant})`}
-        style={{ pointerEvents: 'visibleStroke' }}
-      />
-      
-      {/* Second arrow */}
-      <path
-        d="M13 25L20 18L27 25"
-        stroke={`url(#gradient-${size}-${variant})`}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        filter={`url(#glow-${size}-${variant})`}
-        style={{ pointerEvents: 'visibleStroke' }}
-      />
+      {isForest ? (
+        <>
+          {/* Forest theme: leaf + stem */}
+          <path
+            d="M20 10c-4 2-8 7-8 12 0 4 3.5 6 8 6s8-2 8-6c0-5-4-10-8-12z"
+            stroke={`url(#gradient-${size}-${variant})`}
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            fill="none"
+            filter={`url(#glow-${size}-${variant})`}
+            style={{ pointerEvents: 'visibleStroke' }}
+          />
+          <path
+            d="M20 14v12M17 19c1.5-1 2-2.5 3-4M23 21c-1.5-1-2-2.5-3-4"
+            stroke={`url(#gradient-${size}-${variant})`}
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            fill="none"
+            style={{ pointerEvents: 'visibleStroke' }}
+          />
+        </>
+      ) : (
+        <>
+          {/* Crimson theme: code arrows */}
+          <path
+            d="M13 15L20 22L27 15"
+            stroke={`url(#gradient-${size}-${variant})`}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            filter={`url(#glow-${size}-${variant})`}
+            style={{ pointerEvents: 'visibleStroke' }}
+          />
+          <path
+            d="M13 25L20 18L27 25"
+            stroke={`url(#gradient-${size}-${variant})`}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            filter={`url(#glow-${size}-${variant})`}
+            style={{ pointerEvents: 'visibleStroke' }}
+          />
+        </>
+      )}
       
       {/* Invisible circular hover area */}
       <circle

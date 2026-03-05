@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AnimatedProgressBarProps {
   /** 0–100 */
@@ -13,17 +14,31 @@ interface AnimatedProgressBarProps {
   className?: string;
 }
 
-const gradients: Record<string, string> = {
+const crimsonGradients: Record<string, string> = {
   accent: 'linear-gradient(90deg, #f45b69, #ff7eb3)',
   cyan:   'linear-gradient(90deg, #00d4ff, #7df9ff)',
   gold:   'linear-gradient(90deg, #fbbf24, #f59e0b)',
   green:  'linear-gradient(90deg, #22c55e, #4ade80)',
 };
 
-const glows: Record<string, string> = {
+const forestGradients: Record<string, string> = {
+  accent: 'linear-gradient(90deg, #10b981, #34d399)',
+  cyan:   'linear-gradient(90deg, #2dd4bf, #5eead4)',
+  gold:   'linear-gradient(90deg, #d4a72c, #fbbf24)',
+  green:  'linear-gradient(90deg, #22c55e, #4ade80)',
+};
+
+const crimsonGlows: Record<string, string> = {
   accent: 'rgba(244, 91, 105, 0.35)',
   cyan:   'rgba(0, 212, 255, 0.35)',
   gold:   'rgba(251, 191, 36, 0.35)',
+  green:  'rgba(34, 197, 94, 0.35)',
+};
+
+const forestGlows: Record<string, string> = {
+  accent: 'rgba(16, 185, 129, 0.35)',
+  cyan:   'rgba(45, 212, 191, 0.35)',
+  gold:   'rgba(212, 167, 44, 0.35)',
   green:  'rgba(34, 197, 94, 0.35)',
 };
 
@@ -34,6 +49,9 @@ const AnimatedProgressBar: React.FC<AnimatedProgressBarProps> = ({
   height = 8,
   className = '',
 }) => {
+  const { theme } = useTheme();
+  const gradients = theme === 'forest' ? forestGradients : crimsonGradients;
+  const glows = theme === 'forest' ? forestGlows : crimsonGlows;
   const clamped = Math.max(0, Math.min(100, value));
 
   return (

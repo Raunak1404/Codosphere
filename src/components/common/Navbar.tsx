@@ -3,13 +3,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Code, Calendar, Swords, BookOpen, Trophy, BarChart2, Home, Mail, LogOut, Menu, X, ChevronDown, MoreHorizontal } from 'lucide-react';
 import LogoIcon from './LogoIcon';
 import GlowText from './GlowText';
+import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { logout } from '../../services/firebase/auth';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { theme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -131,7 +134,7 @@ const Navbar = () => {
                       : 'opacity-0 scale-95 pointer-events-none'
                   }`}
                   style={{
-                    background: 'rgba(30, 18, 18, 0.98)',
+                    background: theme === 'forest' ? 'rgba(13, 36, 24, 0.98)' : 'rgba(30, 18, 18, 0.98)',
                     boxShadow: '0 12px 32px rgba(0, 0, 0, 0.3)',
                     zIndex: 9999,
                   }}
@@ -172,7 +175,10 @@ const Navbar = () => {
           </div>
           
           {/* Auth Button - Right side */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center gap-3">
+            {/* Theme Toggle */}
+            <ThemeToggle className="hidden md:flex" />
+
             {currentUser ? (
               <button 
                 className="click-animate hidden md:flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg text-[var(--text-secondary)] hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-200"
@@ -259,6 +265,11 @@ const Navbar = () => {
               <span>Sign in</span>
             </Link>
           )}
+
+          {/* Mobile Theme Toggle */}
+          <div className="flex items-center gap-2 py-3 px-4">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </nav>

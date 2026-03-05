@@ -7,6 +7,7 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getUserProfile } from '../services/firebase';
 import { joinMatchmaking, cancelMatchmaking, listenForMatch, getUserRecentMatches, getMatch } from '../services/matchmaking/index';
 import UserRankCard from '../components/match/UserRankCard';
@@ -16,6 +17,7 @@ import '../styles/study.css';
 
 const RankedMatchPage = () => {
   const { currentUser } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [joining, setJoining] = useState(false);
   const [searchingStatus, setSearchingStatus] = useState<'idle' | 'searching' | 'found' | 'battle-card'>('idle');
@@ -448,7 +450,7 @@ const RankedMatchPage = () => {
         {/* Radial energy glow */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at 50% 45%, rgba(244,91,105,0.10) 0%, rgba(0,212,255,0.04) 40%, transparent 70%)' }}
+          style={{ background: `radial-gradient(ellipse at 50% 45%, ${theme === 'forest' ? 'rgba(16,185,129,0.10)' : 'rgba(244,91,105,0.10)'} 0%, ${theme === 'forest' ? 'rgba(45,212,191,0.04)' : 'rgba(0,212,255,0.04)'} 40%, transparent 70%)` }}
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
         />
@@ -521,7 +523,7 @@ const RankedMatchPage = () => {
                       {/* Pulsing aura */}
                       <motion.div
                         className="absolute -inset-2 rounded-xl blur-lg -z-10"
-                        style={{ background: 'radial-gradient(ellipse at center, rgba(244,91,105,0.12), transparent 70%)' }}
+                        style={{ background: `radial-gradient(ellipse at center, ${theme === 'forest' ? 'rgba(16,185,129,0.12)' : 'rgba(244,91,105,0.12)'}, transparent 70%)` }}
                         animate={{ opacity: [0.4, 0.7, 0.4] }}
                         transition={{ repeat: Infinity, duration: 2.5 }}
                       />
@@ -583,7 +585,7 @@ const RankedMatchPage = () => {
                       />
                       <defs>
                         <linearGradient id="bolt-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#f45b69" />
+                          <stop offset="0%" stopColor={theme === 'forest' ? '#10b981' : '#f45b69'} />
                           <stop offset="100%" stopColor="#00d4ff" />
                         </linearGradient>
                       </defs>
@@ -604,7 +606,7 @@ const RankedMatchPage = () => {
                       initial={{ scale: 5, opacity: 0, rotate: -30 }}
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 180, damping: 12, delay: 0.5 }}
-                      style={{ filter: "drop-shadow(0 0 18px rgba(244,91,105,0.5))" }}
+                      style={{ filter: `drop-shadow(0 0 18px ${theme === 'forest' ? 'rgba(16,185,129,0.5)' : 'rgba(244,91,105,0.5)'})` }}
                     >
                       VS
                     </motion.div>
@@ -717,7 +719,11 @@ const RankedMatchPage = () => {
                     <motion.p
                       className="text-lg font-extrabold uppercase tracking-[0.3em] text-white"
                       animate={{
-                        textShadow: [
+                        textShadow: theme === 'forest' ? [
+                          "0 0 8px rgba(16,185,129,0.4)",
+                          "0 0 30px rgba(16,185,129,0.8)",
+                          "0 0 8px rgba(16,185,129,0.4)",
+                        ] : [
                           "0 0 8px rgba(244,91,105,0.4)",
                           "0 0 30px rgba(244,91,105,0.8)",
                           "0 0 8px rgba(244,91,105,0.4)",
@@ -735,7 +741,7 @@ const RankedMatchPage = () => {
                         initial={{ scale: 3, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 280, damping: 14 }}
-                        style={{ filter: "drop-shadow(0 0 14px rgba(244,91,105,0.5))" }}
+                        style={{ filter: `drop-shadow(0 0 14px ${theme === 'forest' ? 'rgba(16,185,129,0.5)' : 'rgba(244,91,105,0.5)'})` }}
                       >
                         {countdown}
                       </motion.div>
@@ -783,8 +789,8 @@ const RankedMatchPage = () => {
                   style={{
                     width: Math.random() * 3 + 1.5,
                     height: Math.random() * 3 + 1.5,
-                    background: i % 3 === 0 ? '#f45b69' : i % 3 === 1 ? '#00d4ff' : '#ffffff',
-                    boxShadow: i % 3 === 0 ? '0 0 6px #f45b69' : i % 3 === 1 ? '0 0 6px #00d4ff' : '0 0 3px #fff',
+                    background: i % 3 === 0 ? (theme === 'forest' ? '#10b981' : '#f45b69') : i % 3 === 1 ? (theme === 'forest' ? '#2dd4bf' : '#00d4ff') : '#ffffff',
+                    boxShadow: i % 3 === 0 ? `0 0 6px ${theme === 'forest' ? '#10b981' : '#f45b69'}` : i % 3 === 1 ? `0 0 6px ${theme === 'forest' ? '#2dd4bf' : '#00d4ff'}` : '0 0 3px #fff',
                   }}
                 />
               ))}

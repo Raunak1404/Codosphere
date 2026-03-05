@@ -6,6 +6,7 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useProblems } from '../hooks/useProblems';
 import { getUserProfile, getProblemSolvers } from '../services/firebase';
 import '../styles/study.css';
@@ -53,7 +54,11 @@ const Confetti = ({ isVisible }: { isVisible: boolean }) => {
 
 const QuestionOfTheDayPage = () => {
   const { currentUser } = useAuth();
+  const { theme } = useTheme();
   const { problems, loading: problemsLoading } = useProblems();
+
+  const themeAccent = theme === 'forest' ? '#10b981' : '#f45b69';
+  const themeAccentSecondary = theme === 'forest' ? '#2dd4bf' : '#00d4ff';
   const [questionOfTheDay, setQuestionOfTheDay] = useState<any>(null);
   const [isBoxOpened, setIsBoxOpened] = useState(false);
   const [isBoxShaking, setIsBoxShaking] = useState(false);
@@ -167,7 +172,7 @@ const QuestionOfTheDayPage = () => {
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 3 + 1,
-      color: ['#f45b69', '#00d4ff', '#FFD700'][Math.floor(Math.random() * 3)],
+      color: [themeAccent, themeAccentSecondary, '#FFD700'][Math.floor(Math.random() * 3)],
       speed: Math.random() * 1 + 0.5
     }));
     
@@ -375,8 +380,8 @@ const QuestionOfTheDayPage = () => {
                             animate={{ 
                               rotate: boxRotation,
                               boxShadow: isBoxGlowing 
-                                ? "0 0 40px rgba(244, 91, 105, 0.5), 0 0 80px rgba(244, 91, 105, 0.2)" 
-                                : "0 0 20px rgba(244, 91, 105, 0.15)"
+                                ? `0 0 40px rgba(${theme === 'forest' ? '16, 185, 129' : '244, 91, 105'}, 0.5), 0 0 80px rgba(${theme === 'forest' ? '16, 185, 129' : '244, 91, 105'}, 0.2)` 
+                                : `0 0 20px rgba(${theme === 'forest' ? '16, 185, 129' : '244, 91, 105'}, 0.15)`
                             }}
                             transition={{ duration: 0.3 }}
                             whileHover={{ scale: 1.04 }}
