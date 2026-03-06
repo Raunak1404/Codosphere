@@ -6,21 +6,21 @@ export const useThemeColors = () => {
   const { theme } = useTheme();
 
   return useMemo(() => {
-    if (theme === 'forest') {
+    if (theme === 'lagoon') {
       return {
-        accent: '#10b981',
-        accentRgb: '16, 185, 129',
-        accentSecondary: '#2dd4bf',
-        accentSecondaryRgb: '45, 212, 191',
-        accentTertiary: '#d4a72c',
-        primary: '#071a12',
-        primaryRgb: '7, 26, 18',
-        secondary: '#0d2418',
-        secondaryRgb: '13, 36, 24',
-        surface: '#12301f',
-        surfaceRgb: '18, 48, 31',
-        cardBg: 'rgba(13, 36, 24, 0.92)',
-        cardBgSolid: 'rgba(13, 36, 24, 0.98)',
+        accent: '#6FCF99',
+        accentRgb: '111, 207, 153',
+        accentSecondary: '#38BDF8',
+        accentSecondaryRgb: '56, 189, 248',
+        accentTertiary: '#FFD166',
+        primary: '#091B2A',
+        primaryRgb: '9, 27, 42',
+        secondary: '#0F2537',
+        secondaryRgb: '15, 37, 55',
+        surface: '#152D42',
+        surfaceRgb: '21, 45, 66',
+        cardBg: 'rgba(15, 37, 55, 0.92)',
+        cardBgSolid: 'rgba(15, 37, 55, 0.98)',
       };
     }
     return {

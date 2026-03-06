@@ -14,10 +14,10 @@ const LogoIcon: React.FC<LogoIconProps> = ({
   variant = 'default' 
 }) => {
   const { theme } = useTheme();
-  const isForest = theme === 'forest';
+  const isLagoon = theme === 'lagoon';
 
-  const gradientColors = isForest
-    ? { start: '#10b981', end: '#2dd4bf' }
+  const gradientColors = isLagoon
+    ? { start: '#6FCF99', end: '#38BDF8' }
     : { start: '#f45b69', end: '#00d4ff' };
   // Different animation variants for different contexts
   const getAnimationProps = () => {
@@ -101,9 +101,9 @@ const LogoIcon: React.FC<LogoIconProps> = ({
         style={{ pointerEvents: 'visibleStroke' }}
       />
       
-      {isForest ? (
+      {isLagoon ? (
         <>
-          {/* Forest theme: leaf + stem */}
+          {/* Lagoon theme: leaf + stem */}
           <path
             d="M20 10c-4 2-8 7-8 12 0 4 3.5 6 8 6s8-2 8-6c0-5-4-10-8-12z"
             stroke={`url(#gradient-${size}-${variant})`}

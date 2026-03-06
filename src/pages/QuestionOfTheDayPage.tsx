@@ -57,8 +57,8 @@ const QuestionOfTheDayPage = () => {
   const { theme } = useTheme();
   const { problems, loading: problemsLoading } = useProblems();
 
-  const themeAccent = theme === 'forest' ? '#10b981' : '#f45b69';
-  const themeAccentSecondary = theme === 'forest' ? '#2dd4bf' : '#00d4ff';
+  const themeAccent = theme === 'lagoon' ? '#6FCF99' : '#f45b69';
+  const themeAccentSecondary = theme === 'lagoon' ? '#38BDF8' : '#00d4ff';
   const [questionOfTheDay, setQuestionOfTheDay] = useState<any>(null);
   const [isBoxOpened, setIsBoxOpened] = useState(false);
   const [isBoxShaking, setIsBoxShaking] = useState(false);
@@ -380,8 +380,8 @@ const QuestionOfTheDayPage = () => {
                             animate={{ 
                               rotate: boxRotation,
                               boxShadow: isBoxGlowing 
-                                ? `0 0 40px rgba(${theme === 'forest' ? '16, 185, 129' : '244, 91, 105'}, 0.5), 0 0 80px rgba(${theme === 'forest' ? '16, 185, 129' : '244, 91, 105'}, 0.2)` 
-                                : `0 0 20px rgba(${theme === 'forest' ? '16, 185, 129' : '244, 91, 105'}, 0.15)`
+                                ? `0 0 40px rgba(${theme === 'lagoon' ? '111, 207, 153' : '244, 91, 105'}, 0.5), 0 0 80px rgba(${theme === 'lagoon' ? '111, 207, 153' : '244, 91, 105'}, 0.2)` 
+                                : `0 0 20px rgba(${theme === 'lagoon' ? '111, 207, 153' : '244, 91, 105'}, 0.15)`
                             }}
                             transition={{ duration: 0.3 }}
                             whileHover={{ scale: 1.04 }}

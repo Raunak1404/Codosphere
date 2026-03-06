@@ -426,7 +426,7 @@ const StatsPage = () => {
                       {/* Difficulty Cards */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
                         {Object.entries(difficultyStats).map(([difficulty, dStats], index) => {
-                          const color = difficulty === 'Easy' ? '#34d399' : difficulty === 'Medium' ? '#fbbf24' : '#f87171';
+                          const color = difficulty === 'Easy' ? '#8EDBB3' : difficulty === 'Medium' ? '#fbbf24' : '#f87171';
                           const pct = dStats.total > 0 ? Math.round((dStats.solved / dStats.total) * 100) : 0;
                           return (
                             <div key={index} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">

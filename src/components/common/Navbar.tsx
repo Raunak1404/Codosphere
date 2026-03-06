@@ -134,7 +134,7 @@ const Navbar = () => {
                       : 'opacity-0 scale-95 pointer-events-none'
                   }`}
                   style={{
-                    background: theme === 'forest' ? 'rgba(13, 36, 24, 0.98)' : 'rgba(30, 18, 18, 0.98)',
+                    background: theme === 'lagoon' ? 'rgba(15, 37, 55, 0.98)' : 'rgba(30, 18, 18, 0.98)',
                     boxShadow: '0 12px 32px rgba(0, 0, 0, 0.3)',
                     zIndex: 9999,
                   }}

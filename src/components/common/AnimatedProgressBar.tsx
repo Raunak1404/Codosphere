@@ -21,10 +21,10 @@ const crimsonGradients: Record<string, string> = {
   green:  'linear-gradient(90deg, #22c55e, #4ade80)',
 };
 
-const forestGradients: Record<string, string> = {
-  accent: 'linear-gradient(90deg, #10b981, #34d399)',
-  cyan:   'linear-gradient(90deg, #2dd4bf, #5eead4)',
-  gold:   'linear-gradient(90deg, #d4a72c, #fbbf24)',
+const lagoonGradients: Record<string, string> = {
+  accent: 'linear-gradient(90deg, #6FCF99, #8EDBB3)',
+  cyan:   'linear-gradient(90deg, #38BDF8, #7DD3FC)',
+  gold:   'linear-gradient(90deg, #FFD166, #FDE68A)',
   green:  'linear-gradient(90deg, #22c55e, #4ade80)',
 };
 
@@ -35,10 +35,10 @@ const crimsonGlows: Record<string, string> = {
   green:  'rgba(34, 197, 94, 0.35)',
 };
 
-const forestGlows: Record<string, string> = {
-  accent: 'rgba(16, 185, 129, 0.35)',
-  cyan:   'rgba(45, 212, 191, 0.35)',
-  gold:   'rgba(212, 167, 44, 0.35)',
+const lagoonGlows: Record<string, string> = {
+  accent: 'rgba(111, 207, 153, 0.35)',
+  cyan:   'rgba(56, 189, 248, 0.35)',
+  gold:   'rgba(255, 209, 102, 0.35)',
   green:  'rgba(34, 197, 94, 0.35)',
 };
 
@@ -50,8 +50,8 @@ const AnimatedProgressBar: React.FC<AnimatedProgressBarProps> = ({
   className = '',
 }) => {
   const { theme } = useTheme();
-  const gradients = theme === 'forest' ? forestGradients : crimsonGradients;
-  const glows = theme === 'forest' ? forestGlows : crimsonGlows;
+  const gradients = theme === 'lagoon' ? lagoonGradients : crimsonGradients;
+  const glows = theme === 'lagoon' ? lagoonGlows : crimsonGlows;
   const clamped = Math.max(0, Math.min(100, value));
 
   return (

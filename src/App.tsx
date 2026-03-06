@@ -24,7 +24,7 @@ const AdminStudyTopics = lazy(() => import('./pages/AdminStudyTopics'));
 
 // Components
 import AdminRoute from './components/admin/AdminRoute';
-import ForestDecorations from './components/common/ForestDecorations';
+import LagoonDecorations from './components/common/LagoonDecorations';
 
 // ParticleBackground removed for performance — @tsparticles is heavy
 
@@ -76,7 +76,7 @@ function App() {
 
   return (
     <>
-      <ForestDecorations />
+      <LagoonDecorations />
       <Suspense fallback={<PageLoader />}>
         <Routes location={location}>
           {/* Public routes */}

@@ -10,7 +10,7 @@ import './styles/buttons.css';
 import './styles/editor.css';
 import './styles/navbar.css';
 import './styles/animations.css';
-import './styles/forest-theme.css';
+import './styles/lagoon-theme.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
-type Theme = 'crimson' | 'forest';
+type Theme = 'crimson' | 'lagoon';
 
 type ThemeContextType = {
   theme: Theme;
@@ -17,7 +17,7 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem('codosphere-theme');
-    return (stored === 'forest' ? 'forest' : 'crimson') as Theme;
+    return (stored === 'lagoon' ? 'lagoon' : 'crimson') as Theme;
   });
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prev => (prev === 'crimson' ? 'forest' : 'crimson'));
+    setTheme(prev => (prev === 'crimson' ? 'lagoon' : 'crimson'));
   }, []);
 
   return (

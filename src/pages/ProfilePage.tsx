@@ -563,7 +563,7 @@ const ProfilePage = () => {
                             <linearGradient id="winRateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="var(--accent)" />
                               <stop offset="50%" stopColor="var(--accent-secondary)" />
-                              <stop offset="100%" stopColor="#10b981" />
+                              <stop offset="100%" stopColor="#6FCF99" />
                             </linearGradient>
                           </defs>
                         </svg>
