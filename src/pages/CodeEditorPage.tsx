@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Swords, Clock, Code2, Terminal } from 'lucide-react';
 import PageTransition from '../components/common/PageTransition';
+import AmbientBackground from '../components/common/AmbientBackground';
 import ProblemPanel from '../components/problem/ProblemPanel';
 import CodeEditorPanel from '../components/editor/CodeEditorPanel';
 import MatchResultsOverlay from '../components/match/MatchResultsOverlay';
@@ -567,9 +568,7 @@ const CodeEditorPage = () => {
     return (
       <PageTransition>
         <div className="min-h-screen flex flex-col bg-[var(--primary)] relative">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[200px] opacity-[0.04]" />
-          </div>
+          <AmbientBackground variant="editor" />
           <main className="flex-grow flex items-center justify-center relative z-10">
             <motion.div
               className="text-center"
@@ -616,11 +615,7 @@ const CodeEditorPage = () => {
   return (
     <PageTransition>
       <div className="h-screen flex flex-col overflow-hidden bg-[var(--primary)] relative">
-        {/* Ambient background effects */}
-        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full bg-[var(--accent)] filter blur-[250px] opacity-[0.03]" />
-          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-[var(--accent-secondary)] filter blur-[220px] opacity-[0.02]" />
-        </div>
+        <AmbientBackground variant="editor" />
 
         {/* Glassmorphic top bar */}
         <motion.div

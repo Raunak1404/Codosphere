@@ -5,6 +5,7 @@ import { LogIn, UserPlus, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { login, register } from '../services/firebase';
 import LogoIcon from '../components/common/LogoIcon';
 import GlowText from '../components/common/GlowText';
+import AmbientBackground from '../components/common/AmbientBackground';
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -50,52 +51,17 @@ const LoginPage = () => {
     setShowPassword(!showPassword);
   };
 
-  // Background blob animation variants
-  const blobAnimation = {
-    scale: [1, 1.2, 1],
-    opacity: [0.3, 0.5, 0.3],
-    transition: { 
-      duration: 8, 
-      repeat: Infinity, 
-      ease: "easeInOut" 
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-[var(--primary)] relative overflow-hidden">
-      {/* Animated background blobs */}
-      <motion.div 
-        className="absolute inset-0 overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        {/* Animated blobs */}
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full bg-[var(--accent)] filter blur-[200px] opacity-10"
-          animate={blobAnimation}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[var(--accent-secondary)] filter blur-[180px] opacity-10"
-          animate={{
-            ...blobAnimation,
-            transition: { 
-              ...blobAnimation.transition,
-              delay: 2 
-            }
-          }}
-        />
-        <motion.div 
-          className="absolute top-1/2 right-1/3 w-[400px] h-[400px] rounded-full bg-purple-500 filter blur-[150px] opacity-5"
-          animate={{
-            ...blobAnimation,
-            transition: { 
-              ...blobAnimation.transition,
-              delay: 4 
-            }
-          }}
-        />
-      </motion.div>
+      {/* Ambient background — CSS gradients instead of Framer Motion blobs */}
+      <AmbientBackground variant="login" />
+
+      {/* Gentle breathing blobs via CSS animation (compositor-thread, auto-pauses off-screen) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="login-blob login-blob-1" />
+        <div className="login-blob login-blob-2" />
+        <div className="login-blob login-blob-3" />
+      </div>
 
       <div className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-md w-full space-y-8">
@@ -106,7 +72,7 @@ const LoginPage = () => {
                 CodoSphere
               </GlowText>
             </Link>
-            <motion.h2 
+            <motion.h2
               className="mt-6 text-3xl font-extrabold font-display tracking-tight text-[var(--text)]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -114,7 +80,7 @@ const LoginPage = () => {
             >
               {isLogin ? 'Sign in to your account' : 'Create a new account'}
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="mt-2 text-sm text-[var(--text-secondary)]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -126,14 +92,14 @@ const LoginPage = () => {
             </motion.p>
           </div>
 
-          <motion.div 
+          <motion.div
             className="mt-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             {error && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-red-500 bg-opacity-20 text-red-400 p-3 rounded-lg mb-4"
@@ -141,7 +107,7 @@ const LoginPage = () => {
                 {error}
               </motion.div>
             )}
-            
+
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="rounded-md shadow-sm -space-y-px">
                 <div className="mb-4">
@@ -194,7 +160,7 @@ const LoginPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {isLogin && (
                 <div className="flex items-center justify-end">
                   <div className="text-sm">
@@ -204,7 +170,7 @@ const LoginPage = () => {
                   </div>
                 </div>
               )}
-              
+
               <motion.button
                 type="submit"
                 disabled={isLoading}
@@ -240,8 +206,8 @@ const LoginPage = () => {
               </motion.button>
             </form>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="mt-6 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -249,7 +215,7 @@ const LoginPage = () => {
           >
             <p className="text-sm text-[var(--text-secondary)]">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button 
+              <button
                 onClick={() => setIsLogin(!isLogin)}
                 className="ml-2 font-medium text-[var(--accent)] hover:text-[var(--accent-hover)]"
               >
@@ -259,10 +225,10 @@ const LoginPage = () => {
           </motion.div>
         </div>
       </div>
-      
+
       <footer className="py-4 text-center relative z-10">
         <p className="text-xs text-[var(--text-secondary)]">
-          © {new Date().getFullYear()} CodoSphere. All rights reserved.
+          &copy; {new Date().getFullYear()} CodoSphere. All rights reserved.
         </p>
       </footer>
     </div>

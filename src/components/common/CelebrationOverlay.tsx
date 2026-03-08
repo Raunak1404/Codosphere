@@ -4,6 +4,10 @@ import Particles from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
 import type { Engine, ISourceOptions } from '@tsparticles/engine';
 
+// Singleton engine initialization — prevents re-loading on every show toggle
+let engineLoaded = false;
+let enginePromise: Promise<void> | null = null;
+
 interface CelebrationOverlayProps {
   /** When true, the overlay shows and auto-dismisses after `duration` ms */
   show: boolean;
@@ -63,7 +67,13 @@ const CelebrationOverlay: React.FC<CelebrationOverlayProps> = memo(({
   const [visible, setVisible] = useState(false);
 
   const particlesInit = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
+    if (engineLoaded) return;
+    if (!enginePromise) {
+      enginePromise = loadSlim(engine).then(() => {
+        engineLoaded = true;
+      });
+    }
+    await enginePromise;
   }, []);
 
   useEffect(() => {

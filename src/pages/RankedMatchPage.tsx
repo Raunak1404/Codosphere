@@ -13,6 +13,7 @@ import { joinMatchmaking, cancelMatchmaking, listenForMatch, getUserRecentMatche
 import UserRankCard from '../components/match/UserRankCard';
 import RecentMatchCard from '../components/match/RecentMatchCard';
 import AnimatedAvatar from '../components/common/AnimatedAvatar';
+import AmbientBackground from '../components/common/AmbientBackground';
 import '../styles/study.css';
 
 const RankedMatchPage = () => {
@@ -833,12 +834,7 @@ const RankedMatchPage = () => {
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[10%] right-[15%] w-[450px] h-[450px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.03]" />
-            <div className="absolute bottom-[20%] left-[10%] w-[350px] h-[350px] rounded-full bg-[var(--accent-secondary)] filter blur-[150px] opacity-[0.02]" />
-            <div className="study-hex-grid opacity-[0.008]" />
-          </div>
+          <AmbientBackground variant="default" />
 
           <div className="container-custom relative z-10 py-12">
             {/* Header */}

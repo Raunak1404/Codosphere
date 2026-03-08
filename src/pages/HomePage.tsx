@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -9,11 +9,26 @@ import LogoIcon from '../components/common/LogoIcon';
 import GlowText from '../components/common/GlowText';
 import RevealOnScroll from '../components/common/RevealOnScroll';
 import PageTransition from '../components/common/PageTransition';
+import ScrollProgress from '../components/common/ScrollProgress';
+import AmbientBackground from '../components/common/AmbientBackground';
 import '../styles/study.css';
 
 const HomePage = () => {
   const featuresRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const [typedText, setTypedText] = useState('');
+  const fullText = 'Coding Skills';
+
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      setTypedText(fullText.slice(0, i + 1));
+      i++;
+      if (i >= fullText.length) clearInterval(timer);
+    }, 120);
+    return () => clearInterval(timer);
+  }, []);
 
   const scrollToFeatures = () => {
     featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -77,20 +92,11 @@ const HomePage = () => {
 
   return (
     <PageTransition>
+      <ScrollProgress />
       <div className="flex flex-col min-h-screen">
         {/* ===== HERO SECTION ===== */}
         <header className="bg-[var(--primary)] relative min-h-screen flex items-center overflow-hidden">
-          {/* Background mesh — translateZ(0) promotes each blob to its own GPU
-               compositor layer so Safari doesn't re-rasterize on every scroll.
-               Blur radii reduced (180→100, 160→80, 140→60px) for lower GPU load
-               while retaining the ambient-glow look. */}
-          <div className="absolute inset-0 overflow-hidden" style={{ transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)' }}>
-            <div className="absolute top-[15%] left-[20%] w-[600px] h-[600px] rounded-full bg-[var(--accent)] filter blur-[100px] opacity-[0.06]" style={{ transform: 'translateZ(0)' }} />
-            <div className="absolute bottom-[15%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent-secondary)] filter blur-[80px] opacity-[0.05]" style={{ transform: 'translateZ(0)' }} />
-            <div className="absolute top-[60%] left-[50%] w-[400px] h-[400px] rounded-full bg-[var(--accent-tertiary)] filter blur-[60px] opacity-[0.03]" style={{ transform: 'translateZ(0)' }} />
-            {/* Hex grid pattern */}
-            <div className="study-hex-grid opacity-[0.015]" />
-          </div>
+          <AmbientBackground variant="home" showHexGrid hexGridOpacity={0.015} />
 
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[var(--primary)] opacity-60" />
 
@@ -146,7 +152,8 @@ const HomePage = () => {
                 <h1 className="text-4xl md:text-6xl font-display font-bold mb-6 tracking-tight leading-[1.1]">
                   Elevate Your{' '}
                   <span className="bg-gradient-to-r from-[var(--accent)] via-[var(--accent-secondary)] to-[var(--accent)] bg-clip-text text-transparent bg-[length:200%_auto] animate-[text-shimmer_4s_linear_infinite]">
-                    Coding Skills
+                    {typedText}
+                    <span className="inline-block w-0.5 h-[1em] bg-[var(--accent)] animate-pulse ml-0.5 align-baseline" />
                   </span>
                 </h1>
 
@@ -320,7 +327,7 @@ const HomePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {features.map((feature, index) => (
-                <RevealOnScroll key={index} delay={index * 0.07}>
+                <RevealOnScroll key={index} delay={index * 0.07} className={index === 0 ? 'lg:col-span-2' : ''}>
                   <Link to={feature.link} className="block h-full">
                     <motion.div
                       className="topic-card h-full p-6 flex flex-col group"

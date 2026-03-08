@@ -13,6 +13,7 @@ import AnimatedProgressBar from '../components/common/AnimatedProgressBar';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile } from '../services/firebase';
 import { useProblems } from '../hooks/useProblems';
+import AmbientBackground from '../components/common/AmbientBackground';
 import '../styles/study.css';
 
 // Define achievements with criteria - same as in ProfilePage
@@ -229,9 +230,7 @@ const StatsPage = () => {
         <div className="min-h-screen flex flex-col">
           <Navbar />
           <main className="flex-grow py-16 relative">
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute top-[30%] left-[40%] w-[400px] h-[400px] rounded-full bg-[var(--accent)] filter blur-[160px] opacity-[0.04]" />
-            </div>
+            <AmbientBackground variant="default" />
             <div className="container-custom relative z-10 flex items-center justify-center min-h-[60vh]">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -267,12 +266,7 @@ const StatsPage = () => {
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[10%] right-[15%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.04]" />
-            <div className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] rounded-full bg-[var(--accent-secondary)] filter blur-[160px] opacity-[0.03]" />
-            <div className="study-hex-grid opacity-[0.01]" />
-          </div>
+          <AmbientBackground variant="default" showHexGrid hexGridOpacity={0.01} />
 
           <div className="container-custom relative z-10 py-12">
             {/* Header */}

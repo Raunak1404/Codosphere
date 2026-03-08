@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useSharedInView } from '../../hooks/useSharedInView';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'scale';
 
@@ -31,8 +32,7 @@ const RevealOnScroll: React.FC<RevealOnScrollProps> = ({
   className = '',
   once = true,
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once, amount: threshold });
+  const [ref, inView] = useSharedInView({ threshold, once });
 
   const offset = offsets[direction];
 

@@ -10,6 +10,8 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
 import { getPublicStudyTopics, AdminStudyTopic } from '../services/firebase/studyTopics';
+import AmbientBackground from '../components/common/AmbientBackground';
+import ScrollProgress from '../components/common/ScrollProgress';
 import '../styles/study.css';
 
 // Icon mapping
@@ -136,16 +138,14 @@ const StudyPage: React.FC = () => {
 
   return (
     <PageTransition>
+      <ScrollProgress />
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
         <main className="flex-grow">
           {/* ===== HERO SECTION ===== */}
           <section className="relative pt-16 pb-12 overflow-hidden">
-            {/* Background decorative elements */}
-            <div className="study-hex-grid" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[var(--accent)] filter blur-[200px] opacity-[0.04]" />
-            <div className="absolute bottom-0 right-0 w-[300px] h-[300px] rounded-full bg-[var(--accent-secondary)] filter blur-[150px] opacity-[0.03]" />
+            <AmbientBackground variant="study" showHexGrid />
 
             <div className="container-custom relative z-10">
               <motion.div

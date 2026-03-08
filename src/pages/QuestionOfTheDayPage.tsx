@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useProblems } from '../hooks/useProblems';
 import { getUserProfile, getProblemSolvers } from '../services/firebase';
+import AmbientBackground from '../components/common/AmbientBackground';
 import '../styles/study.css';
 
 // Get a daily problem based on the current date and the loaded problems list
@@ -260,12 +261,7 @@ const QuestionOfTheDayPage = () => {
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.04]" />
-            <div className="absolute bottom-[20%] right-[15%] w-[400px] h-[400px] rounded-full bg-[var(--accent-tertiary)] filter blur-[160px] opacity-[0.03]" />
-            <div className="study-hex-grid opacity-[0.01]" />
-          </div>
+          <AmbientBackground variant="default" showHexGrid hexGridOpacity={0.01} />
 
           <div className="container-custom relative z-10 py-12">
             {/* Header */}

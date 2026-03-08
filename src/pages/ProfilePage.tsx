@@ -8,6 +8,8 @@ import AnimatedAvatar from '../components/common/AnimatedAvatar';
 import UserRankCard from '../components/match/UserRankCard';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile, updateUserProfile, uploadProfileImage } from '../services/firebase';
+import AmbientBackground from '../components/common/AmbientBackground';
+import ScrollProgress from '../components/common/ScrollProgress';
 import '../styles/study.css';
 
 // Define achievements with criteria
@@ -233,11 +235,9 @@ const ProfilePage = () => {
   const earnedCount = userAchievements.length;
   const totalCount = achievementsList.length;
 
-  // Only the earned achievements (up to 3 most recent)
+  // Only show achievements the user has earned
   const earnedAchievementsList = useMemo(() => {
-    return achievementsList
-      .filter(a => userAchievements.includes(a.id))
-      .slice(-3); // Show last 3 earned
+    return achievementsList.filter(a => userAchievements.includes(a.id));
   }, [userAchievements]);
 
   // Win rate calculation
@@ -290,15 +290,12 @@ const ProfilePage = () => {
 
   return (
     <PageTransition>
+      <ScrollProgress />
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Lightweight background — fewer blurs */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[5%] left-[10%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[200px] opacity-[0.04]" />
-            <div className="absolute bottom-[15%] right-[5%] w-[400px] h-[400px] rounded-full bg-[var(--accent-secondary)] filter blur-[180px] opacity-[0.03]" />
-          </div>
+          <AmbientBackground variant="default" />
 
           <div className="container-custom relative z-10 py-10">
             {/* ═══ HERO PROFILE BANNER ═══ */}
@@ -654,49 +651,44 @@ const ProfilePage = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 space-y-2.5">
+                  <div className="p-4 grid grid-cols-1 gap-2">
                     {earnedAchievementsList.length > 0 ? (
                       earnedAchievementsList.map((achievement) => (
-                        <div 
+                        <div
                           key={achievement.id}
-                          className="group flex items-center gap-3 p-3.5 rounded-xl bg-gradient-to-r from-white/[0.04] via-white/[0.02] to-transparent border border-white/[0.08] hover:border-[var(--accent)]/25 transition-all hover:-translate-y-0.5 duration-200"
+                          className="group flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 bg-gradient-to-r from-white/[0.04] via-white/[0.02] to-transparent border-white/[0.08] hover:border-[var(--accent)]/25 hover:-translate-y-0.5"
                         >
-                          {/* Icon with glow */}
                           <div className="relative flex-shrink-0">
                             <div className="absolute inset-0 rounded-xl bg-[var(--accent)]/10 blur-sm group-hover:bg-[var(--accent)]/20 transition-colors" />
-                            <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent-secondary)]/10 flex items-center justify-center text-2xl shadow-inner border border-white/[0.06]">
+                            <div className="relative w-10 h-10 rounded-xl flex items-center justify-center text-xl border border-white/[0.06] bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent-secondary)]/10">
                               {achievement.icon}
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm truncate">{achievement.name}</p>
-                            <p className="text-[10px] text-[var(--text-secondary)] truncate mt-0.5">{achievement.description}</p>
+                            <p className="font-semibold text-xs truncate">{achievement.name}</p>
+                            <p className="text-[9px] text-[var(--text-secondary)] truncate mt-0.5">{achievement.description}</p>
                           </div>
-                          <div className="w-6 h-6 rounded-full bg-emerald-400/15 flex items-center justify-center shrink-0">
-                            <Check size={13} className="text-emerald-400" />
+                          <div className="w-5 h-5 rounded-full bg-emerald-400/15 flex items-center justify-center shrink-0">
+                            <Check size={11} className="text-emerald-400" />
                           </div>
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-8">
-                        <div className="w-14 h-14 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mx-auto mb-3">
-                          <Trophy className="text-[var(--text-secondary)] opacity-40" size={24} />
-                        </div>
-                        <p className="text-sm font-semibold text-[var(--text-secondary)] mb-1">No achievements yet</p>
-                        <p className="text-[11px] text-[var(--text-secondary)]/60">Start solving problems to earn badges!</p>
+                      <div className="text-center py-6">
+                        <Trophy size={24} className="mx-auto mb-2 text-[var(--text-secondary)] opacity-30" />
+                        <p className="text-xs text-[var(--text-secondary)]">No achievements earned yet</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] mt-1">Keep coding to unlock achievements!</p>
                       </div>
                     )}
-                    
-                    {/* View all link */}
-                    <div className="pt-2 border-t border-white/[0.04]">
-                      <a 
-                        href="/stats" 
-                        className="flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-colors group"
-                      >
-                        <span>View All Achievements</span>
-                        <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                      </a>
-                    </div>
+
+                    {/* View all on Stats page */}
+                    <a
+                      href="/stats"
+                      className="flex items-center justify-center gap-1.5 mt-2 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[11px] font-semibold text-[var(--text-secondary)] hover:text-[var(--accent)] hover:border-[var(--accent)]/20 hover:bg-[var(--accent)]/5 transition-all"
+                    >
+                      View All Achievements
+                      <ArrowRight size={12} />
+                    </a>
                   </div>
                 </div>
               </div>

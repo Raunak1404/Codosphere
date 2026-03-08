@@ -4,6 +4,7 @@ import { Mail, Phone, MapPin, MessageSquare, Send, ChevronDown, Sparkles, Headph
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import PageTransition from '../components/common/PageTransition';
+import AmbientBackground from '../components/common/AmbientBackground';
 import '../styles/study.css';
 
 const ContactPage = () => {
@@ -56,13 +57,7 @@ const ContactPage = () => {
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background ambient */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] filter blur-[200px] opacity-[0.04]" />
-            <div className="absolute bottom-[15%] right-[10%] w-[400px] h-[400px] rounded-full bg-[var(--accent-secondary)] filter blur-[180px] opacity-[0.03]" />
-            <div className="absolute top-[60%] left-[60%] w-[300px] h-[300px] rounded-full bg-purple-500 filter blur-[160px] opacity-[0.02]" />
-            <div className="study-hex-grid opacity-[0.008]" />
-          </div>
+          <AmbientBackground variant="default" showHexGrid hexGridOpacity={0.008} />
 
           <div className="container-custom relative z-10 py-10">
             {/* ═══ HEADER ═══ */}

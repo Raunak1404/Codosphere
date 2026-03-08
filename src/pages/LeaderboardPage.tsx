@@ -8,6 +8,8 @@ import PageTransition from '../components/common/PageTransition';
 import { useAuth } from '../context/AuthContext';
 import { getLeaderboard, getUserProfile, getUserRankPosition } from '../services/firebase';
 import AnimatedAvatar from '../components/common/AnimatedAvatar';
+import AmbientBackground from '../components/common/AmbientBackground';
+import ScrollProgress from '../components/common/ScrollProgress';
 
 // ── Types ──
 interface LeaderboardUser {
@@ -125,15 +127,12 @@ const LeaderboardPage = () => {
 
   return (
     <PageTransition>
+      <ScrollProgress />
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] rounded-full bg-amber-400 filter blur-[200px] opacity-[0.03]" />
-            <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.03]" />
-          </div>
+          <AmbientBackground variant="leaderboard" />
 
           <div className="container-custom relative z-10 py-10">
             {/* ═══ HEADER ═══ */}
@@ -186,7 +185,9 @@ const LeaderboardPage = () => {
                 transition={{ duration: 0.35, delay: 0.05 }}
                 className="mb-8"
               >
-                <div className="grid grid-cols-3 gap-3 items-end max-w-2xl mx-auto">
+                <div className="grid grid-cols-3 gap-3 items-end max-w-2xl mx-auto" style={{ perspective: '800px' }}>
+                  {/* 3D tilt container */}
+                  <div className="col-span-3 grid grid-cols-3 gap-3 items-end" style={{ transform: 'rotateX(3deg)', transformStyle: 'preserve-3d' }}>
                   {/* 2nd place */}
                   <div className="flex flex-col items-center">
                     <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-300/40 mb-2">
@@ -225,6 +226,7 @@ const LeaderboardPage = () => {
                     <div className="w-full mt-2 rounded-t-xl bg-gradient-to-t from-amber-700/10 to-amber-600/5 border border-white/[0.06] border-b-0 flex items-end justify-center h-16">
                       <span className="text-2xl font-bold text-amber-600 mb-2">3</span>
                     </div>
+                  </div>
                   </div>
                 </div>
               </motion.div>
@@ -286,8 +288,11 @@ const LeaderboardPage = () => {
                             const displayRank = user.rank;
                             const isCurrentUser = currentUser && user.id === currentUser.uid;
                             return (
-                              <tr
+                              <motion.tr
                                 key={user.id}
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2, delay: index * 0.02 }}
                                 className={`border-b border-white/[0.03] transition-colors hover:bg-white/[0.02] ${
                                   isCurrentUser ? 'bg-[var(--accent)]/[0.04]' : ''
                                 }`}
@@ -324,7 +329,7 @@ const LeaderboardPage = () => {
                                     <span className="text-sm text-emerald-400">{user.stats?.rankWins || 0}</span>
                                   </td>
                                 )}
-                              </tr>
+                              </motion.tr>
                             );
                           })}
                           {filteredLeaderboard.length === 0 && !loading && (

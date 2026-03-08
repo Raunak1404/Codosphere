@@ -8,6 +8,7 @@ import PageTransition from '../components/common/PageTransition';
 import { useProblems } from '../hooks/useProblems';
 import { useAuth } from '../context/AuthContext';
 import { getUserProfile } from '../services/firebase';
+import AmbientBackground from '../components/common/AmbientBackground';
 import '../styles/study.css';
 
 const CodePage = () => {
@@ -101,12 +102,7 @@ const CodePage = () => {
         <Navbar />
 
         <main className="flex-grow relative">
-          {/* Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[15%] right-[20%] w-[450px] h-[450px] rounded-full bg-[var(--accent)] filter blur-[180px] opacity-[0.03]" />
-            <div className="absolute bottom-[25%] left-[15%] w-[350px] h-[350px] rounded-full bg-[var(--accent-secondary)] filter blur-[150px] opacity-[0.02]" />
-            <div className="study-hex-grid opacity-[0.008]" />
-          </div>
+          <AmbientBackground variant="default" showHexGrid hexGridOpacity={0.008} />
 
           <div className="container-custom relative z-10 py-12">
             {/* Header */}
